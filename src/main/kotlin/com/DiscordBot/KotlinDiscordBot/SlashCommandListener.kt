@@ -1,9 +1,9 @@
-package com.DiscordBot.KotlinDiscordBot.command
+package com.DiscordBot.KotlinDiscordBot
 
+import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.springframework.stereotype.Component
-import kotlin.text.get
 
 @Component
 class SlashCommandListener(private val commands: List<SlashCommand>) : ListenerAdapter() {
