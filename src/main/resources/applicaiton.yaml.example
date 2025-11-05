@@ -1,0 +1,28 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: KotlinBot
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/kotlinbot}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: ${DATABASE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_AUTO:update}                           # validate | update | create | create-drop | none
+    show-sql: ${JPA_SQL:false}                               # 반드시 true/false
+    database-platform: ${DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
+
+discord:
+  token: ${DISCORD_TOKEN}
+
+jda:
+  intents: ${JDA_INTENTS:}
+
+botcommands:
+  owners: ${BOTCOMMANDS_OWNERS:}
+  prefixes:

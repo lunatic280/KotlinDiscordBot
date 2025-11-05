@@ -22,19 +22,21 @@ repositories {
 }
 
 dependencies {
+	implementation("net.dv8tion:JDA:5.4.0")
+
+	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
-	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	runtimeOnly("org.postgresql:postgresql")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.json:json:20240303")
+	implementation("org.jsoup:jsoup:1.17.2")
+	implementation("me.paulschwarz:spring-dotenv:4.0.0")
 }
 
 kotlin {

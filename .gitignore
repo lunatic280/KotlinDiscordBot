@@ -38,3 +38,11 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+# Env files
+src/main/resources/.env
+.env.*
+!.env.example
+
+.application.yaml
+!.application.yaml.example
