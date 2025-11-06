@@ -1,4 +1,4 @@
-package com.DiscordBot.KotlinDiscordBot.coin
+package com.DiscordBot.KotlinDiscordBot.coin.util
 
 enum class Market(
     val code: String,

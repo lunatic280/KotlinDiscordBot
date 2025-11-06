@@ -1,15 +1,21 @@
-package com.DiscordBot.KotlinDiscordBot.coin
+package com.DiscordBot.KotlinDiscordBot.coin.commands
 
+import com.DiscordBot.KotlinDiscordBot.coin.data.TickerDto
+import com.DiscordBot.KotlinDiscordBot.coin.data.showRate
+import com.DiscordBot.KotlinDiscordBot.coin.service.CoinService
+import com.DiscordBot.KotlinDiscordBot.coin.util.Change
+import com.DiscordBot.KotlinDiscordBot.coin.util.Market
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
-import okio.Options
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.Instant
 
 @Component
 class SearchCommand(
@@ -25,13 +31,31 @@ class SearchCommand(
                 .setEphemeral(true).queue()
             return
         }
-        val market = Market.fromKName(input)
+        val market = Market.Companion.fromKName(input)
         if (market == null) {
             event.reply("맞는 코인이 없어요. $market, $input").setEphemeral(true).queue()
             return
         }
-        val result = coinService.getCoin(market)
-        event.reply("$input, $market, $result, $log.").queue()
+        val resultTickerDto: TickerDto? = coinService.getCoin(market)
+        if (resultTickerDto == null) {
+            event.reply("시세를 불러오지 못했습니다. 잠시 후에 다시 시도해주세요").setEphemeral(true).queue()
+        }
+
+        val change = Change.fromApi(resultTickerDto?.change)
+        val pct = resultTickerDto?.showRate()
+
+        val eb = EmbedBuilder()
+            .setTitle("${market.code} 시세")              // KRW-BTC 시세
+            .setDescription(change.labelWithPct(pct))     // 🔴 ▲ 상승 (+1.23%)
+            .addField("시가", "%,d원".format(resultTickerDto?.opening_price), true)
+            .addField("고가", "%,d원".format(resultTickerDto?.high_price), true)
+            .addField("저가", "%,d원".format(resultTickerDto?.low_price), true)
+            .addField("종가(최근 체결가)", "%,d원".format(resultTickerDto?.trade_price), false)
+            .setTimestamp(Instant.now())
+
+        change.color?.let { eb.setColor(it) }            // 상승=빨강, 하락=파랑, 보합=검정
+
+        event.replyEmbeds(eb.build()).queue()
     }
 
     override fun getCommandData(): SlashCommandData {

@@ -37,6 +37,8 @@ dependencies {
 	implementation("org.json:json:20240303")
 	implementation("org.jsoup:jsoup:1.17.2")
 
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
 }
 
 kotlin {
