@@ -23,12 +23,6 @@ class Member(
     private var money: Long = 0,
 
 ) {
-    protected constructor() : this(
-        id = null,
-        username = "",
-        userId = "",
-        money = 0,
-    )
 
     companion object {
         fun create(
