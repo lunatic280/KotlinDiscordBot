@@ -1,24 +1,23 @@
-server:
-  port: 8000
-
 spring:
+  main:
+    web-application-type: none
+
   application:
     name: KotlinBot
 
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/kotlinbot}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
-    driver-class-name: ${DATABASE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/discordbot_db}
+    username: ${DB_USERNAME:discordbot}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: ${JPA_AUTO:update}                           # validate | update | create | create-drop | none
-    show-sql: ${JPA_SQL:false}                               # 반드시 true/false
-    database-platform: ${DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
+      ddl-auto: ${DDL_AUTO:validate}
+    show-sql: ${SHOW_SQL:false}
 
 discord:
-  token: ${DISCORD_TOKEN}
+  token: ${DISCORD_TOKEN:}
 
 jda:
   intents: ${JDA_INTENTS:}
