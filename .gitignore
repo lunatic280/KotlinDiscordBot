@@ -25,17 +25,18 @@ out/
 Thumbs.db
 *.log
 
-# --- Spring real configs (절대 커밋 금지) ---
+# real configs (no commit)
 src/main/resources/application.yml
 src/main/resources/application.yaml
 src/main/resources/application-*.yml
 src/main/resources/application-*.yaml
 
-# --- Examples are allowed ---
+# examples (commit ok)
 !src/main/resources/application.example.yml
 !src/main/resources/application.example.yaml
 !src/main/resources/application-*.example.yml
 !src/main/resources/application-*.example.yaml
+
 
 # --- Env files (secrets) ---
 .env
