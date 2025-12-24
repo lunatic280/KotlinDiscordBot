@@ -22,6 +22,9 @@ class Member(
     @Column(nullable = false, unique = true)
     val userId: String,
 
+    @Column(nullable = false)
+    private var nickname: String,
+
     //코인 재산
     @Column(nullable = false)
     private var money: Long = 1_000_000_000, //십억
@@ -53,14 +56,22 @@ class Member(
         level += 1
     }
 
+    //닉네임 관련 메서드
+    fun getNickname() = nickname
+    fun updateNickname(newNickname: String) {
+        nickname = newNickname
+    }
+
     companion object {
         fun create(
             username: String,
             userId: String,
+            nickname: String
         ): Member {
             return Member(
                 username = username,
                 userId = userId,
+                nickname = nickname
             )
         }
     }
@@ -70,6 +81,7 @@ class Member(
             id = this.id,
             username = this.username,
             userId = this.userId,
+            nickname = this.nickname,
             money = this.getMoney(),
             level = this.level,
             lastDailyReward = this.lastDailyReward
