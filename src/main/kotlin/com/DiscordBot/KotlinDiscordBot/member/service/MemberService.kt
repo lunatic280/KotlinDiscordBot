@@ -4,11 +4,14 @@ import com.DiscordBot.KotlinDiscordBot.member.data.MemberCreateDto
 import com.DiscordBot.KotlinDiscordBot.member.data.MemberDto
 import com.DiscordBot.KotlinDiscordBot.member.domain.Member
 import com.DiscordBot.KotlinDiscordBot.member.repository.MemberRepository
+import com.DiscordBot.KotlinDiscordBot.money.domain.Wallet
+import com.DiscordBot.KotlinDiscordBot.money.repository.WalletRepository
 import org.springframework.stereotype.Service
 
 @Service
 class MemberService(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val walletRepository: WalletRepository
 ) {
 
 
@@ -22,6 +25,10 @@ class MemberService(
             nickname = memberCreateDto.nickname
         )
         val savedMember = memberRepository.save(member)
+
+        //멤버의 지갑도 같이 추가
+        val wallet = Wallet.createWallet(savedMember)
+        val savedWallet = walletRepository.save(wallet)
         return savedMember.toDto()
     }
 }

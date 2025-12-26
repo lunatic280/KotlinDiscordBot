@@ -7,7 +7,6 @@ data class MemberDto(
     val username: String,
     val userId: String,
     val nickname: String,
-    val money: Long,
     val level: Long,
     val lastDailyReward: LocalDate?
 )

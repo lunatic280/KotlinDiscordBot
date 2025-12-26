@@ -6,9 +6,19 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.LocalDate
 
 @Entity
+@Table(
+    name = "members",
+    uniqueConstraints = [UniqueConstraint(
+        name = "uk_members_user_id",
+        columnNames = ["user_id"]
+    )
+    ]
+)
 class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,15 +29,12 @@ class Member(
     val username: String,
 
     //디스코드 아이디
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, unique = true)
     val userId: String,
 
     @Column(nullable = false)
     private var nickname: String,
 
-    //코인 재산
-    @Column(nullable = false)
-    private var money: Long = 1_000_000_000, //십억
 
     //레벨
     @Column(name = "level")
@@ -38,17 +45,6 @@ class Member(
     private var lastDailyReward: LocalDate? = null
 
 ) {
-
-    //재산 관련 메서드
-    fun getMoney(): Long = money
-    fun makeMoney(amount: Long) {
-        money += amount
-    }
-    fun lossMoney(amount: Long): Boolean {
-        if (money < amount) return false
-        money -= amount
-        return true
-    }
 
     //레벨 관련 메서드
     fun getLevel() = level
@@ -82,7 +78,6 @@ class Member(
             username = this.username,
             userId = this.userId,
             nickname = this.nickname,
-            money = this.getMoney(),
             level = this.level,
             lastDailyReward = this.lastDailyReward
         )
