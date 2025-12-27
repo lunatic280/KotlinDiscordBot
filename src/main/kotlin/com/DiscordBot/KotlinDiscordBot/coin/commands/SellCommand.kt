@@ -94,7 +94,7 @@ class SellCommand(
             )
             .addOptions(
                 OptionData(OptionType.STRING, "count", "coin count", true)
-                    .setNameLocalization(DiscordLocale.KOREAN, "코인 개수")
+                    .setNameLocalization(DiscordLocale.KOREAN, "코인개수")
                     .setDescriptionLocalization(DiscordLocale.KOREAN, "판매할 코인개수를 입력하세요")
             )
     }
