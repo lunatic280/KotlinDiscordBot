@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.TimeoutException
 
 @Component
 class SearchCommand(
@@ -39,6 +41,7 @@ class SearchCommand(
 
         event.deferReply().queue()
         coinService.getCoin(market)
+            .timeout(Duration.ofSeconds(10))
             .subscribe(
                 { dto ->
                     val change = Change.fromApi(dto.change)
@@ -55,10 +58,15 @@ class SearchCommand(
 
                     change.color?.let { eb.setColor(it) }            // 상승=빨강, 하락=파랑, 보합=검정
 
-                    event.replyEmbeds(eb.build()).queue()
+                    event.hook.sendMessageEmbeds(eb.build()).queue()
                 },
                 { err ->
-                    event.hook.editOriginal("시세를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.").queue()
+                    val message = if (err is TimeoutException) {
+                        "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."
+                    } else {
+                        "시세를 불러오지 못했습니다. 잠시 후 다시 시도해주세요."
+                    }
+                    event.hook.editOriginal(message).queue()
                 }
             )
 

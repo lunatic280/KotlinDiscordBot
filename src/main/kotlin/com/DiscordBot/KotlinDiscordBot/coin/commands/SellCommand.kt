@@ -3,6 +3,8 @@ package com.DiscordBot.KotlinDiscordBot.coin.commands
 import com.DiscordBot.KotlinDiscordBot.coin.service.CoinService
 import com.DiscordBot.KotlinDiscordBot.coin.util.Market
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
+import java.time.Duration
+import java.util.concurrent.TimeoutException
 import com.DiscordBot.KotlinDiscordBot.member.service.MemberService
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.DiscordLocale
@@ -52,6 +54,7 @@ class SellCommand(
 
         event.deferReply().queue()
         coinService.getCoin(market)
+            .timeout(Duration.ofSeconds(10))
             .subscribe(
                 { dto ->
                     try {
@@ -70,8 +73,12 @@ class SellCommand(
                     }
                 },
                 { error ->
-                    event.hook.sendMessage("코인 시세 조회 실패. 잠시 후 다시 시도해주세요.")
-                        .setEphemeral(true).queue()
+                    val message = if (error is TimeoutException) {
+                        "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."
+                    } else {
+                        "코인 시세 조회 실패. 잠시 후 다시 시도해주세요."
+                    }
+                    event.hook.sendMessage(message).setEphemeral(true).queue()
                 }
             )
     }
