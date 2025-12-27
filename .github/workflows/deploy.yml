@@ -1,0 +1,70 @@
+name: deploy-bot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read   # 최소 권한
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod_bot   # required reviewers + secrets 환경
+
+    steps:
+      # --- 1) 소스 코드 가져오기 ---
+      - name: Clone repo
+        run: |
+          git clone "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" .
+          git checkout "${{ github.sha }}"
+
+      # --- 2) Java/Gradle 환경 준비 ---
+      - name: Set up JDK 21
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-21-jdk
+
+      # --- 3) Build the jar ---
+      - name: Build bootJar
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean bootJar -x test
+          # 저장된 jar 경로를 환경 변수로 등록
+          JAR_PATH=$(ls -1t build/libs/*.jar | head -n 1)
+          echo "JAR_PATH=$JAR_PATH" >> $GITHUB_ENV
+
+      # --- 4) SSH key setup ---
+      - name: Configure SSH key
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          # Secret에 저장된 private key를 파일로
+          printf "%s\n" "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          # known_hosts (MITM 방지)
+          printf "%s\n" "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      # --- 5) SCP로 jar 업로드 ---
+      - name: Upload jar
+        run: |
+          scp -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile=~/.ssh/known_hosts \
+              -P "${{ vars.DEPLOY_PORT }}" \
+              "${{ env.JAR_PATH }}" \
+              "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}:/tmp/app.jar"
+
+      # --- 6) Pi에서 배포 스크립트 실행 & 서비스 재시작 ---
+      - name: Deploy & restart discordbot
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile=~/.ssh/known_hosts \
+              -p "${{ vars.DEPLOY_PORT }}" \
+              "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}" \
+              "sudo /usr/local/bin/deploy-discordbot /tmp/app.jar"
