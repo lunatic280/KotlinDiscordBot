@@ -1,6 +1,7 @@
 package com.DiscordBot.KotlinDiscordBot.money.domain
 
 import com.DiscordBot.KotlinDiscordBot.member.domain.Member
+import com.DiscordBot.KotlinDiscordBot.money.dto.WalletDto
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -29,6 +30,7 @@ class Wallet(
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     val member: Member,
 
+    //보유 현금
     @Column(name = "cash", nullable = false)
     private var cash: Long
 
@@ -53,5 +55,13 @@ class Wallet(
         require(amount >= 0) { "amount must be >= 0" }
         require(cash >= amount) { "insufficient cash" }
         cash = Math.subtractExact(cash, amount)
+    }
+
+    fun toDto(): WalletDto {
+        return WalletDto(
+            id = id,
+            memberId = member.userId,
+            cash = cash
+        )
     }
 }

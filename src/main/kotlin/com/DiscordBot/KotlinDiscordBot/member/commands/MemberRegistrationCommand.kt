@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import org.springframework.stereotype.Component
 
 @Component
-class MemberRegistration(
+class MemberRegistrationCommand(
     private val memberService: MemberService
 ): SlashCommand {
     override val name: String = "registration"

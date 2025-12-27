@@ -2,6 +2,7 @@ package com.DiscordBot.KotlinDiscordBot.money.domain
 
 import com.DiscordBot.KotlinDiscordBot.coin.util.Market
 import com.DiscordBot.KotlinDiscordBot.coin.util.MarketCodeConverter
+import com.DiscordBot.KotlinDiscordBot.money.dto.PositionDto
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -41,8 +42,8 @@ class Position(
     @Column(name = "market_count", nullable = false)
     private var marketCount: Long = 0,
 
-    @Column(name = "cost", nullable = false)
-    private var cost: Long = 0
+    @Column(name = "total_cost", nullable = false)
+    private var totalCost: Long = 0
     ) {
 
     companion object {
@@ -56,13 +57,43 @@ class Position(
                 wallet = wallet,
                 market = market,
                 marketCount = marketCount,
-                cost = cost
+                totalCost = cost
             )
         }
     }
 
     fun getMarketCount(): Long = marketCount
-    fun getTotalCost(): Long = cost
+    fun getTotalCost(): Long = totalCost
+
+    fun addMarketCount(addCount: Long) {
+        marketCount += addCount
+    }
+
+    fun minMarketCount(minCount: Long) {
+        require(minCount > 0) { "minCount값이 0보다 작거나 같습니다" }
+        require(minCount <= marketCount) { "minCount값이 더 높습니다." }
+        marketCount -= minCount
+    }
+
+    fun addTotalCost(addTotalCost: Long) {
+        totalCost += addTotalCost
+    }
+
+    fun subtractCost(subtractCost: Long) {
+        require(subtractCost > 0) {"subtractCost값이 0보다 작거나 같습니다"}
+        require(subtractCost <= totalCost) { "subtractCost값이 더 많습니다"}
+        totalCost -= subtractCost
+    }
 
     //TODO set함수 만들어야함
+
+    fun toDto(): PositionDto {
+        return PositionDto(
+            id = id!!,
+            walletId = wallet.id!!,
+            market = market,
+            marketCount = marketCount,
+            cost = totalCost
+        )
+    }
 }

@@ -7,14 +7,25 @@ import com.DiscordBot.KotlinDiscordBot.member.repository.MemberRepository
 import com.DiscordBot.KotlinDiscordBot.money.domain.Wallet
 import com.DiscordBot.KotlinDiscordBot.money.repository.WalletRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class MemberService(
     private val memberRepository: MemberRepository,
     private val walletRepository: WalletRepository
 ) {
+    fun existsMember(userId: String): Boolean {
+        return memberRepository.existsByUserId(userId)
+    }
+
+    fun getMember(userId: String): MemberDto {
+        val get = memberRepository.findByUserId(userId)
+        return get
+    }
 
 
+    @Transactional
     fun memberRegistration(memberCreateDto: MemberCreateDto): MemberDto? {
         if (memberRepository.existsByUserId(memberCreateDto.userId)) {
             return null

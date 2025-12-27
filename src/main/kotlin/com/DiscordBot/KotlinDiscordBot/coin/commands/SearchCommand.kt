@@ -36,26 +36,32 @@ class SearchCommand(
             event.reply("맞는 코인이 없어요. $market, $input").setEphemeral(true).queue()
             return
         }
-        val resultTickerDto: TickerDto? = coinService.getCoin(market)
-        if (resultTickerDto == null) {
-            event.reply("시세를 불러오지 못했습니다. 잠시 후에 다시 시도해주세요").setEphemeral(true).queue()
-        }
 
-        val change = Change.fromApi(resultTickerDto?.change)
-        val pct = resultTickerDto?.showRate()
+        event.deferReply().queue()
+        coinService.getCoin(market)
+            .subscribe(
+                { dto ->
+                    val change = Change.fromApi(dto.change)
+                    val pct = dto.showRate()
 
-        val eb = EmbedBuilder()
-            .setTitle("${market.code} 시세")              // KRW-BTC 시세
-            .setDescription(change.labelWithPct(pct))     // 🔴 ▲ 상승 (+1.23%)
-            .addField("시가", "%,d원".format(resultTickerDto?.opening_price), true)
-            .addField("고가", "%,d원".format(resultTickerDto?.high_price), true)
-            .addField("저가", "%,d원".format(resultTickerDto?.low_price), true)
-            .addField("종가(최근 체결가)", "%,d원".format(resultTickerDto?.trade_price), false)
-            .setTimestamp(Instant.now())
+                    val eb = EmbedBuilder()
+                        .setTitle("${market.code} 시세")              // KRW-BTC 시세
+                        .setDescription(change.labelWithPct(pct))     // 🔴 ▲ 상승 (+1.23%)
+                        .addField("시가", "%,d원".format(dto?.opening_price), true)
+                        .addField("고가", "%,d원".format(dto?.high_price), true)
+                        .addField("저가", "%,d원".format(dto?.low_price), true)
+                        .addField("종가(최근 체결가)", "%,d원".format(dto?.trade_price), false)
+                        .setTimestamp(Instant.now())
 
-        change.color?.let { eb.setColor(it) }            // 상승=빨강, 하락=파랑, 보합=검정
+                    change.color?.let { eb.setColor(it) }            // 상승=빨강, 하락=파랑, 보합=검정
 
-        event.replyEmbeds(eb.build()).queue()
+                    event.replyEmbeds(eb.build()).queue()
+                },
+                { err ->
+                    event.hook.editOriginal("시세를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.").queue()
+                }
+            )
+
     }
 
     override fun getCommandData(): SlashCommandData {
