@@ -10,5 +10,5 @@ interface WalletRepository: JpaRepository<Wallet, Long> {
 
     fun findByMemberUserId(userId: String): Wallet?
 
-    fun findTop10ByOrderByTotalWealthDesc(): List<WalletDto>
+    fun findTop10ByOrderByTotalWealthDesc(): List<Wallet>
 }

@@ -17,5 +17,6 @@ class WalletService(
 
     fun getTop10Ranking(): List<WalletDto> {
         return walletRepository.findTop10ByOrderByTotalWealthDesc()
+            .map { it.toDto() }
     }
 }
