@@ -56,7 +56,7 @@ class CoinService(
                 tickers.mapNotNull { ticker ->
                     val market = Market.fromCode(ticker.market)
                     if (market != null) {
-                        market to ticker.opening_price
+                        market to ticker.trade_price  // 현재가 사용 (opening_price는 시가)
                     } else null
                 }.toMap()
             }
