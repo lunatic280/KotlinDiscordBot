@@ -91,10 +91,10 @@ class SellCommand(
                             dto = member,
                             market = market,
                             count = count,
-                            cost = dto.opening_price
+                            cost = dto.trade_price
                         )
 
-                        val totalRevenue = dto.opening_price * count
+                        val totalRevenue = dto.trade_price * count
 
                         val embed = EmbedBuilder()
                             .setColor(Color.BLUE)
@@ -102,7 +102,7 @@ class SellCommand(
                             .setDescription("${market.koreanName} 판매에 성공했습니다!")
                             .addField("코인", market.koreanName, true)
                             .addField("개수", "${formatter.format(count)}개", true)
-                            .addField("개당 가격", "${formatter.format(dto.opening_price)}원", true)
+                            .addField("개당 가격", "${formatter.format(dto.trade_price)}원", true)
                             .addField("총 수익", "${formatter.format(totalRevenue)}원", false)
                             .setFooter("${event.user.effectiveName}", event.user.avatarUrl)
                             .build()

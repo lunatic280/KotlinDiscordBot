@@ -89,9 +89,9 @@ class BuyCommand(
                             dto = member,
                             market = market,
                             count = count,
-                            cost = dto.opening_price //현재가 사용
+                            cost = dto.trade_price //현재가 사용
                         )
-                        val totalCost = dto.opening_price * count
+                        val totalCost = dto.trade_price * count
 
                         val embed = EmbedBuilder()
                             .setColor(Color.GREEN)
@@ -99,7 +99,7 @@ class BuyCommand(
                             .setDescription("${market.koreanName} 구매에 성공했습니다.")
                             .addField("코인", market.koreanName, true)
                             .addField("개수", "${formatter.format(count)}개", true)
-                            .addField("개당 가격", "${formatter.format(dto.opening_price)}원", true)
+                            .addField("개당 가격", "${formatter.format(dto.trade_price)}원", true)
                             .addField("총 금액","${formatter.format(totalCost)}원", false)
                             .setFooter("${event.user.effectiveName}", event.user.avatarUrl)
                             .build()
