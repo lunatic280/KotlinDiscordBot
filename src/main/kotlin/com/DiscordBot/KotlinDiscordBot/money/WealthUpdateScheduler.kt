@@ -27,35 +27,44 @@ class WealthUpdateScheduler(
 
         try {
             val allPositions = positionRepository.findAll()
-            if (allPositions.isEmpty()) {
-                log.info("업데이트할 포지션이 없습니다.")
-                return
+            log.info("조회된 포지션 수: ${allPositions.size}")
+
+            // 포지션이 없어도 지갑 업데이트는 진행 (코인 전량 판매 시에도 업데이트 필요)
+            val prices: Map<Market, Long> = if (allPositions.isNotEmpty()) {
+                val markets = allPositions.map { it.market }.distinct()
+                log.info("조회할 마켓: $markets")
+                val result = coinService.getCoinList(markets)
+                    .block(Duration.ofSeconds(30)) ?: emptyMap()
+                log.info("조회된 가격: $result")
+                result
+            } else {
+                emptyMap()
             }
-
-            val markets = allPositions
-                .map { it.market }
-                .distinct()
-
-            if (markets.isEmpty()) {
-                log.info("마켓 포지션이 없습니다")
-                return
-            }
-
-            val prices: Map<Market, Long> = coinService.getCoinList(markets)
-                .block(Duration.ofSeconds(30)) ?: emptyMap()
 
             val positionsByWallet = allPositions.groupBy { it.wallet.id }
+            log.info("지갑별 포지션 그룹: ${positionsByWallet.keys}")
 
+            // 모든 지갑 업데이트 (포지션 유무와 관계없이)
             val wallets = walletRepository.findAll()
+            if (wallets.isEmpty()) {
+                log.info("업데이트할 지갑이 없습니다.")
+                return
+            }
+
             wallets.forEach { wallet ->
                 val walletPositions = positionsByWallet[wallet.id] ?: emptyList()
+                log.info("지갑 ${wallet.id}: 포지션 ${walletPositions.size}개")
 
                 val coinValue = walletPositions.sumOf { position ->
                     val price = prices[position.market] ?: 0L
-                    position.getMarketCount() * price
+                    val value = position.getMarketCount() * price
+                    log.info("  - ${position.market}: ${position.getMarketCount()}개 × ${price}원 = ${value}원")
+                    value
                 }
 
+                val oldWealth = wallet.getTotalWealth()
                 wallet.updateTotalWealth(coinValue)
+                log.info("지갑 ${wallet.id}: 코인가치=${coinValue}, 현금=${wallet.getCash()}, 총재산: ${oldWealth} → ${wallet.getTotalWealth()}")
             }
             walletRepository.saveAll(wallets)
 

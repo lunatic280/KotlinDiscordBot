@@ -3,7 +3,6 @@ package com.DiscordBot.KotlinDiscordBot.coin.service
 import com.DiscordBot.KotlinDiscordBot.coin.data.TickerDto
 import com.DiscordBot.KotlinDiscordBot.coin.util.Market
 import com.DiscordBot.KotlinDiscordBot.member.data.MemberDto
-import com.DiscordBot.KotlinDiscordBot.member.repository.MemberRepository
 import com.DiscordBot.KotlinDiscordBot.money.domain.Position
 import com.DiscordBot.KotlinDiscordBot.money.domain.Wallet
 import com.DiscordBot.KotlinDiscordBot.money.dto.PositionDto
@@ -57,7 +56,7 @@ class CoinService(
                 tickers.mapNotNull { ticker ->
                     val market = Market.fromCode(ticker.market)
                     if (market != null) {
-                        market to ticker.opening_price
+                        market to ticker.trade_price  // 현재가 사용 (opening_price는 시가)
                     } else null
                 }.toMap()
             }
@@ -83,20 +82,24 @@ class CoinService(
 
         //데이터베이스에 position이 존재하지 않는다면 if문 안에서 처리
         val findPosition = positionRepository.findByWalletIdAndMarket(findWallet.id!!, market)
+        val resultPosition: Position
         if (findPosition == null) {
             //포지션에서 산 내용 등록
-            val newSavedPosition = positionRepository.save(position)
+            resultPosition = positionRepository.save(position)
             //보유 현급에서 코인값 차감
             findWallet.subtractCash(totalCost)
-            return newSavedPosition.toDto()
         } else {
             findPosition.addTotalCost(totalCost)
             findPosition.addMarketCount(count)
             findWallet.subtractCash(totalCost)
-            return findPosition.toDto()
+            resultPosition = findPosition
         }
 
+        // 즉시 totalWealth 업데이트 (구매한 코인은 구매가 기준으로 계산)
+        val coinValue = calculateCoinValue(findWallet)
+        findWallet.updateTotalWealth(coinValue)
 
+        return resultPosition.toDto()
     }
 
     @Transactional
@@ -124,7 +127,20 @@ class CoinService(
         if (findPosition.getMarketCount() == 0L) {
             positionRepository.delete(findPosition)
         }
+
+        // 즉시 totalWealth 업데이트
+        val coinValue = calculateCoinValue(findWallet)
+        findWallet.updateTotalWealth(coinValue)
+
         return resultDto
     }
 
+    /**
+     * 지갑의 코인 가치 계산 (원가 기준)
+     * 스케줄러가 현재가로 업데이트할 때까지 원가 기준으로 표시
+     */
+    private fun calculateCoinValue(wallet: Wallet): Long {
+        val positions = positionRepository.findByWalletId(wallet.id!!)
+        return positions.sumOf { it.getTotalCost() }
+    }
 }

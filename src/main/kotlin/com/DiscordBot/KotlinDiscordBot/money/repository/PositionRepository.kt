@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface PositionRepository : JpaRepository<Position, Long> {
     fun findByWalletIdAndMarket(walletId: Long, market: Market): Position?
-    fun findByWalletId(walletId: Long): List<PositionDto>
+    fun findByWalletId(walletId: Long): List<Position>
 }
