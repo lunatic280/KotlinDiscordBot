@@ -3,11 +3,13 @@ package com.DiscordBot.KotlinDiscordBot.money.commands
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import com.DiscordBot.KotlinDiscordBot.member.service.MemberService
 import com.DiscordBot.KotlinDiscordBot.money.service.WalletService
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import org.springframework.stereotype.Component
+import java.awt.Color
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -15,40 +17,51 @@ import java.util.Locale
 class MyWealthCommand(
     private val memberService: MemberService,
     private val walletService: WalletService
-) : SlashCommand{
+) : SlashCommand {
     override val name: String = "wallet"
-    override val description: String = "checkmywallet"
+    override val description: String = "check my wallet"
 
     override fun handle(event: SlashCommandInteractionEvent) {
         val userId = event.user.idLong.toString()
 
         if (!memberService.existsMember(userId)) {
-            event.reply("먼저 등록을 해야합니다").setEphemeral(true).queue()
+            event.replyEmbeds(
+                EmbedBuilder()
+                    .setColor(Color.ORANGE)
+                    .setTitle("등록 필요")
+                    .setDescription("먼저 등록을 해야합니다.")
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
 
         val wallet = walletService.getWalletByUserId(userId)
         if (wallet == null) {
-            event.reply("지갑 정보를 찾을 수 없습니다").setEphemeral(true).queue()
+            event.replyEmbeds(
+                EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("오류")
+                    .setDescription("지갑 정보를 찾을 수 없습니다.")
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
 
         val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
-        val cashFormatted = formatter.format(wallet.cash)
         val coinValue = wallet.totalWealth - wallet.cash
-        val coinFormatted = formatter.format(coinValue)
-        val totalFormatted = formatter.format(wallet.totalWealth)
 
-        val message = """                                                                                                                        
-              **${event.user.effectiveName}님의 재산**                                                                                             
-              ━━━━━━━━━━━━━━━━━                                                                                                                    
-              현금: ${cashFormatted}원                                                                                                             
-              코인: ${coinFormatted}원                                                                                                             
-              ━━━━━━━━━━━━━━━━━                                                                                                                    
-              총 재산: ${totalFormatted}원                                                                                                         
-          """.trimIndent()
+        val embed = EmbedBuilder()
+            .setColor(Color(0x5865F2))
+            .setTitle("${event.user.effectiveName}님의 재산")
+            .setThumbnail(event.user.avatarUrl)
+            .addField("현금", "${formatter.format(wallet.cash)}원", true)
+            .addField("코인 가치", "${formatter.format(coinValue)}원", true)
+            .addField("\u200B", "\u200B", true)
+            .addField("총 재산", "${formatter.format(wallet.totalWealth)}원", false)
+            .setFooter("5분마다 코인 가치가 업데이트됩니다")
+            .build()
 
-        event.reply(message).queue()
+        event.replyEmbeds(embed).queue()
     }
 
     override fun getCommandData(): SlashCommandData {

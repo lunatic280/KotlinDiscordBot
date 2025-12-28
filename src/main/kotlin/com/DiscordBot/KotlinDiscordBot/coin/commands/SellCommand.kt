@@ -3,9 +3,8 @@ package com.DiscordBot.KotlinDiscordBot.coin.commands
 import com.DiscordBot.KotlinDiscordBot.coin.service.CoinService
 import com.DiscordBot.KotlinDiscordBot.coin.util.Market
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
-import java.time.Duration
-import java.util.concurrent.TimeoutException
 import com.DiscordBot.KotlinDiscordBot.member.service.MemberService
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -13,46 +12,76 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 import org.springframework.stereotype.Component
+import java.awt.Color
+import java.text.NumberFormat
+import java.time.Duration
+import java.util.Locale
+import java.util.concurrent.TimeoutException
 
 @Component
 class SellCommand(
     private val memberService: MemberService,
     private val coinService: CoinService
-): SlashCommand {
+) : SlashCommand {
     override val name: String = "sell"
-    override val description: String = "sellcoin"
+    override val description: String = "sell coin"
 
     override fun handle(event: SlashCommandInteractionEvent) {
         val inputCoinName = event.getOption("name")?.asString?.trim()
         val inputCoinCount = event.getOption("count")?.asString?.trim()
 
         if (inputCoinName.isNullOrBlank() || inputCoinCount.isNullOrBlank()) {
-            event.reply("코인 이름 또는 코인 개수가 비었어요. 예) 비트코인 / 이더리움 / 도지코인 / 1 2 3")
-                .setEphemeral(true).queue()
+            event.replyEmbeds(
+                EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("입력 오류")
+                    .setDescription("코인 이름 또는 개수가 비었어요.")
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
 
         val count = inputCoinCount.toLongOrNull()
         if (count == null || count <= 0) {
-            event.reply("코인 개수는 1 이상의 숫자여야 합니다.")
-                .setEphemeral(true).queue()
+            event.replyEmbeds(
+                EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("입력 오류")
+                    .setDescription("코인 개수는 1 이상의 숫자여야 합니다.")
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
 
-        val market = Market.Companion.fromKName(inputCoinName)
+        val market = Market.fromKName(inputCoinName)
         if (market == null) {
-            event.reply("맞는 코인이 없어요: $inputCoinName").setEphemeral(true).queue()
+            event.replyEmbeds(
+                EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("코인 없음")
+                    .setDescription("'$inputCoinName' 코인을 찾을 수 없습니다.")
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
 
         val userId = event.user.idLong.toString()
         if (!memberService.existsMember(userId)) {
-            event.reply("먼저 등록을 해야합니다").setEphemeral(true).queue()
+            event.replyEmbeds(
+                EmbedBuilder()
+                    .setColor(Color.ORANGE)
+                    .setTitle("등록 필요")
+                    .setDescription("먼저 등록을 해야합니다.")
+                    .build()
+            ).setEphemeral(true).queue()
             return
         }
+
         val member = memberService.getMember(userId)
+        val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
 
         event.deferReply().queue()
+
         coinService.getCoin(market)
             .timeout(Duration.ofSeconds(10))
             .subscribe(
@@ -64,21 +93,46 @@ class SellCommand(
                             count = count,
                             cost = dto.opening_price
                         )
-                        event.hook.sendMessage(
-                            "${market.koreanName} ${count}개 판매 완료! (개당 ${dto.opening_price}원)"
-                        ).queue()
+
+                        val totalRevenue = dto.opening_price * count
+
+                        val embed = EmbedBuilder()
+                            .setColor(Color.BLUE)
+                            .setTitle("판매 완료")
+                            .setDescription("${market.koreanName} 판매에 성공했습니다!")
+                            .addField("코인", market.koreanName, true)
+                            .addField("개수", "${formatter.format(count)}개", true)
+                            .addField("개당 가격", "${formatter.format(dto.opening_price)}원", true)
+                            .addField("총 수익", "${formatter.format(totalRevenue)}원", false)
+                            .setFooter("${event.user.effectiveName}", event.user.avatarUrl)
+                            .build()
+
+                        event.hook.sendMessageEmbeds(embed).queue()
+
                     } catch (e: IllegalArgumentException) {
-                        event.hook.sendMessage("판매 실패: ${e.message}")
-                            .setEphemeral(true).queue()
+                        val errorEmbed = EmbedBuilder()
+                            .setColor(Color.RED)
+                            .setTitle("판매 실패")
+                            .setDescription(e.message ?: "알 수 없는 오류")
+                            .build()
+
+                        event.hook.sendMessageEmbeds(errorEmbed).setEphemeral(true).queue()
                     }
                 },
                 { error ->
                     val message = if (error is TimeoutException) {
-                        "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요."
+                        "요청 시간이 초과되었습니다."
                     } else {
                         "코인 시세 조회 실패. 잠시 후 다시 시도해주세요."
                     }
-                    event.hook.sendMessage(message).setEphemeral(true).queue()
+
+                    val errorEmbed = EmbedBuilder()
+                        .setColor(Color.RED)
+                        .setTitle("오류 발생")
+                        .setDescription(message)
+                        .build()
+
+                    event.hook.sendMessageEmbeds(errorEmbed).setEphemeral(true).queue()
                 }
             )
     }
