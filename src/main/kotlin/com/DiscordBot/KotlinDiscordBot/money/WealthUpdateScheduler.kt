@@ -27,26 +27,25 @@ class WealthUpdateScheduler(
 
         try {
             val allPositions = positionRepository.findAll()
-            if (allPositions.isEmpty()) {
-                log.info("업데이트할 포지션이 없습니다.")
-                return
+
+            // 포지션이 없어도 지갑 업데이트는 진행 (코인 전량 판매 시에도 업데이트 필요)
+            val prices: Map<Market, Long> = if (allPositions.isNotEmpty()) {
+                val markets = allPositions.map { it.market }.distinct()
+                coinService.getCoinList(markets)
+                    .block(Duration.ofSeconds(30)) ?: emptyMap()
+            } else {
+                emptyMap()
             }
-
-            val markets = allPositions
-                .map { it.market }
-                .distinct()
-
-            if (markets.isEmpty()) {
-                log.info("마켓 포지션이 없습니다")
-                return
-            }
-
-            val prices: Map<Market, Long> = coinService.getCoinList(markets)
-                .block(Duration.ofSeconds(30)) ?: emptyMap()
 
             val positionsByWallet = allPositions.groupBy { it.wallet.id }
 
+            // 모든 지갑 업데이트 (포지션 유무와 관계없이)
             val wallets = walletRepository.findAll()
+            if (wallets.isEmpty()) {
+                log.info("업데이트할 지갑이 없습니다.")
+                return
+            }
+
             wallets.forEach { wallet ->
                 val walletPositions = positionsByWallet[wallet.id] ?: emptyList()
 
