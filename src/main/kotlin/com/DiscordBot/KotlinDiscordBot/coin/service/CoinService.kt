@@ -95,9 +95,8 @@ class CoinService(
             resultPosition = findPosition
         }
 
-        // 즉시 totalWealth 업데이트 (구매한 코인은 구매가 기준으로 계산)
-        val coinValue = calculateCoinValue(findWallet)
-        findWallet.updateTotalWealth(coinValue)
+        // totalWealth는 스케줄러가 1분마다 시장가로 업데이트함
+        // 여기서 업데이트하면 시장가 이익/손실이 원가로 리셋됨
 
         return resultPosition.toDto()
     }
@@ -128,19 +127,8 @@ class CoinService(
             positionRepository.delete(findPosition)
         }
 
-        // 즉시 totalWealth 업데이트
-        val coinValue = calculateCoinValue(findWallet)
-        findWallet.updateTotalWealth(coinValue)
+        // totalWealth는 스케줄러가 1분마다 시장가로 업데이트함
 
         return resultDto
-    }
-
-    /**
-     * 지갑의 코인 가치 계산 (원가 기준)
-     * 스케줄러가 현재가로 업데이트할 때까지 원가 기준으로 표시
-     */
-    private fun calculateCoinValue(wallet: Wallet): Long {
-        val positions = positionRepository.findByWalletId(wallet.id!!)
-        return positions.sumOf { it.getTotalCost() }
     }
 }
