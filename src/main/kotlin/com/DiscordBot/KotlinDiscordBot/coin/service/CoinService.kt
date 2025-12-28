@@ -89,8 +89,11 @@ class CoinService(
             //보유 현급에서 코인값 차감
             findWallet.subtractCash(totalCost)
         } else {
+            //포지션에서 산 가격 설정
             findPosition.addTotalCost(totalCost)
+            //코인 개수
             findPosition.addMarketCount(count)
+            //지갑에서 전체 포지션 가격 차감
             findWallet.subtractCash(totalCost)
             resultPosition = findPosition
         }

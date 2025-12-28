@@ -41,6 +41,7 @@ class WealthUpdateScheduler(
                 emptyMap()
             }
 
+            //지갑별로 포지션 나눔
             val positionsByWallet = allPositions.groupBy { it.wallet.id }
             log.info("지갑별 포지션 그룹: ${positionsByWallet.keys}")
 
