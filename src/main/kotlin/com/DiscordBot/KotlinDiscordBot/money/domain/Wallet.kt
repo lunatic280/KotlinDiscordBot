@@ -32,14 +32,17 @@ class Wallet(
 
     //보유 현금
     @Column(name = "cash", nullable = false)
-    private var cash: Long
+    private var cash: Long,
+
+    @Column(name = "total_wealth", nullable = false)
+    private var totalWealth: Long
 
 
 ) {
 
     companion object {
         fun createWallet(member: Member): Wallet {
-            return Wallet(member = member, cash = 1_000_000_000L)
+            return Wallet(member = member, cash = 1_000_000_000L, totalWealth = 1_000_000_000L)
         }
     }
 
@@ -57,11 +60,19 @@ class Wallet(
         cash = Math.subtractExact(cash, amount)
     }
 
+    //totalWealth 관련 함수
+    fun getCoinValue() = totalWealth - cash
+    fun getTotalWealth(): Long = totalWealth
+    fun updateTotalWealth(coinValue: Long) {
+        totalWealth = this.cash + coinValue
+    }
+
     fun toDto(): WalletDto {
         return WalletDto(
             id = id,
             memberId = member.userId,
-            cash = cash
+            cash = cash,
+            totalWealth = totalWealth
         )
     }
 }

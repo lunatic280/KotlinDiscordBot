@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface WalletRepository: JpaRepository<Wallet, Long> {
 
     fun findByMemberId(memberId: Long): Wallet
+
+    fun findByMemberUserId(userId: String): Wallet?
+
+    fun findTop10ByOrderByTotalWealthDesc(): List<Wallet>
 }

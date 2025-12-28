@@ -37,6 +37,33 @@ class CoinService(
             .doOnError { error -> log.warn("코인 시세 조회 실패: ${market.code}", error) }
     }
 
+    fun getCoinList(markets: List<Market>): Mono<Map<Market, Long>> {
+        if (markets.isEmpty()) {
+            return Mono.just(emptyMap())
+        }
+
+        val marketCodes = markets.joinToString(",") { it.code }
+
+        return webClient.get()
+            .uri { uriBuilder ->
+                uriBuilder.path("/v1/ticker")
+                    .queryParam("markets", marketCodes)
+                    .build()
+            }
+            .retrieve()
+            .bodyToFlux(TickerDto::class.java)
+            .collectList()
+            .map { tickers ->
+                tickers.mapNotNull { ticker ->
+                    val market = Market.fromCode(ticker.market)
+                    if (market != null) {
+                        market to ticker.opening_price
+                    } else null
+                }.toMap()
+            }
+            .doOnError { error -> log.warn("코인 시세 일괄 조회 실패", error) }
+    }
+
     @Transactional
     fun buyCoin(dto: MemberDto, market: Market, count: Long, cost: Long): PositionDto {
 

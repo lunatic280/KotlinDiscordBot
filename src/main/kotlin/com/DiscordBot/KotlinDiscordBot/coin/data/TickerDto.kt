@@ -11,7 +11,8 @@ data class TickerDto(
     val change_rate: Double? = null,
     val signed_change_rate: Double? = null,
     val prev_closing_price: Long? = null,
-    val change: String
+    val change: String,
+    val market: String
 )
 
 fun TickerDto.showRate(): Double? {
