@@ -53,7 +53,7 @@ class MyWealthCommand(
 
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
-            .setNameLocalization(DiscordLocale.KOREAN, "내 재산")
+            .setNameLocalization(DiscordLocale.KOREAN, "내재산")
             .setDescriptionLocalization(DiscordLocale.KOREAN, "내 재산 확인하기")
     }
 }
