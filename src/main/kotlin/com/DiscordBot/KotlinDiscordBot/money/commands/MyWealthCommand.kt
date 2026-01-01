@@ -2,6 +2,8 @@ package com.DiscordBot.KotlinDiscordBot.money.commands
 
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import com.DiscordBot.KotlinDiscordBot.member.service.MemberService
+import com.DiscordBot.KotlinDiscordBot.money.repository.PositionRepository
+import com.DiscordBot.KotlinDiscordBot.money.service.PositionService
 import com.DiscordBot.KotlinDiscordBot.money.service.WalletService
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -16,7 +18,8 @@ import java.util.Locale
 @Component
 class MyWealthCommand(
     private val memberService: MemberService,
-    private val walletService: WalletService
+    private val walletService: WalletService,
+    private val positionService: PositionService
 ) : SlashCommand {
     override val name: String = "wallet"
     override val description: String = "check my wallet"
@@ -47,6 +50,8 @@ class MyWealthCommand(
             return
         }
 
+        val listPosition = positionService.getPositionMarketList(wallet.id!!)
+
         val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
         val coinValue = wallet.totalWealth - wallet.cash
 
@@ -58,10 +63,22 @@ class MyWealthCommand(
             .addField("코인 가치", "${formatter.format(coinValue)}원", true)
             .addField("\u200B", "\u200B", true)
             .addField("총 재산", "${formatter.format(wallet.totalWealth)}원", false)
-            .setFooter("5분마다 코인 가치가 업데이트됩니다")
-            .build()
 
-        event.replyEmbeds(embed).queue()
+        if (listPosition.isEmpty()) {
+            embed.addField("보유 코인", "보유한 코인이 없습니다.", false)
+        } else {
+            listPosition.forEach { position ->
+                embed.addField(
+                    position.market.koreanName,
+                    "${formatter.format(position.marketCount)}개",
+                    true
+                )
+            }
+        }
+
+        embed.setFooter("5분마다 코인 가치가 업데이트됩니다")
+
+        event.replyEmbeds(embed.build()).queue()
     }
 
     override fun getCommandData(): SlashCommandData {
