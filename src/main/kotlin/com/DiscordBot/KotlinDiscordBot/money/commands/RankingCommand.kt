@@ -53,7 +53,7 @@ class RankingCommand(
             .setColor(Color(0xFFD700))
             .setTitle(":trophy: 재산 랭킹 TOP 10")
             .setDescription(rankingText)
-            .setFooter("5분마다 업데이트됩니다")
+            .setFooter("1분마다 업데이트됩니다")
             .build()
 
         event.replyEmbeds(embed).queue()

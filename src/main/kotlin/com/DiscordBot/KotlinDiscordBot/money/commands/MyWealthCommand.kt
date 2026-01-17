@@ -76,7 +76,7 @@ class MyWealthCommand(
             }
         }
 
-        embed.setFooter("5분마다 코인 가치가 업데이트됩니다")
+        embed.setFooter("1분마다 코인 가치가 업데이트됩니다")
 
         event.replyEmbeds(embed.build()).queue()
     }
