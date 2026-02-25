@@ -61,6 +61,22 @@ jobs:
               "${{ env.JAR_PATH }}" \
               "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}:/tmp/app.jar"
 
+      - name: Update server runtime env
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile=~/.ssh/known_hosts \
+              -p "${{ vars.DEPLOY_PORT }}" \
+              "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}" \
+              "sudo sh -c 'printf \"%s\n\" \
+              \"PUBG_API_KEY=${{ secrets.PUBG_API_KEY }}\" \
+              \"SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}\" \
+              \"SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}\" \
+              \"SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}\" \
+              > /etc/discordbot.env' && \
+              sudo chmod 600 /etc/discordbot.env && \
+              sudo chown root:root /etc/discordbot.env"
+
       - name: Deploy & restart discordbot
         run: |
           ssh -i ~/.ssh/id_ed25519 \
