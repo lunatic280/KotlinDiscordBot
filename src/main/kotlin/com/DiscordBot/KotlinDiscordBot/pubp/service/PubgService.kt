@@ -18,7 +18,8 @@ import reactor.core.publisher.Mono
 class PubgService(
     private val webClientBuilder: WebClient.Builder,
     private val pubgRepository: PubgRepository,
-    @Value("\${pubg.api-key}") private val apiKey: String, private val memberRepository: MemberRepository
+    @Value("\${pubg.api-key}") private val apiKey: String,
+    private val memberRepository: MemberRepository
 ) {
 
     private val log = LoggerFactory.getLogger(PubgService::class.java)
