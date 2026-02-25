@@ -6,9 +6,15 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 class WebConfig {
+
     @Bean
-    fun webClient(): WebClient = WebClient.builder()
+    fun webClientBuilder(): WebClient.Builder = webClientBuilder()
+
+    @Bean
+    fun webClient(builder: WebClient.Builder): WebClient =
+        builder
         .baseUrl("https://api.bithumb.com")
         .defaultHeader("accept", "application/json")
-        .build()
+            .build()
+
 }
