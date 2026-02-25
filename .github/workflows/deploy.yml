@@ -69,9 +69,9 @@ jobs:
               -p "${{ vars.DEPLOY_PORT }}" \
               "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}" \
               "tmp=\$(mktemp) && \
-              (grep -v '^PUBG_API_KEY=' /etc/discordbot.env 2>/dev/null || true) > \$tmp && \
+              (grep -v '^PUBG_API_KEY=' /opt/discordbot/bot/.env 2>/dev/null || true) > \$tmp && \
               printf '%s\n' 'PUBG_API_KEY=${{ secrets.PUBG_API_KEY }}' >> \$tmp && \
-              install -m 600 \$tmp /etc/discordbot.env && \
+              install -m 600 \$tmp /opt/discordbot/bot/.env && \
               rm -f \$tmp"
 
       - name: Deploy & restart discordbot
