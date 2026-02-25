@@ -68,13 +68,11 @@ jobs:
               -o UserKnownHostsFile=~/.ssh/known_hosts \
               -p "${{ vars.DEPLOY_PORT }}" \
               "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}" \
-              "sudo sh -c 'touch /etc/discordbot.env && \
-              grep -v \"^PUBG_API_KEY=\" /etc/discordbot.env > /tmp/discordbot.env.tmp || true && \
-              printf \"%s\n\" \"PUBG_API_KEY=${{ secrets.PUBG_API_KEY }}\" >> /tmp/discordbot.env.tmp && \
-              install -m 600 -o root -g root /tmp/discordbot.env.tmp /etc/discordbot.env && \
-              rm -f /tmp/discordbot.env.tmp' && \
-              sudo chmod 600 /etc/discordbot.env && \
-              sudo chown root:root /etc/discordbot.env"
+              "tmp=\$(mktemp) && \
+              (grep -v '^PUBG_API_KEY=' /etc/discordbot.env 2>/dev/null || true) > \$tmp && \
+              printf '%s\n' 'PUBG_API_KEY=${{ secrets.PUBG_API_KEY }}' >> \$tmp && \
+              install -m 600 \$tmp /etc/discordbot.env && \
+              rm -f \$tmp"
 
       - name: Deploy & restart discordbot
         run: |
