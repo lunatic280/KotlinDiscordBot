@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository
 interface PubgRepository : JpaRepository<PubgPlayers, Long> {
 
     fun findByMember_UserId(userId: String): PubgPlayers
-    fun existByPlayerId(playerId: String): Boolean
+    fun existsByPlayerId(playerId: String): Boolean
 }

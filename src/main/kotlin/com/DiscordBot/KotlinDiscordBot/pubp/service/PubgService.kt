@@ -70,7 +70,7 @@ class PubgService(
     @Transactional
     fun registrationPlayer(userId: String, playerId: String): PubgPlayers {
         log.info("registrationPlayer() called. userId={}, playerId={}", userId, playerId)
-        if (pubgRepository.existByPlayerId(playerId)) {
+        if (pubgRepository.existsByPlayerId(playerId)) {
             log.warn("registrationPlayer() failed. duplicated playerId={}", playerId)
             throw EntityExistsException("playerId is exists")
         } else {
