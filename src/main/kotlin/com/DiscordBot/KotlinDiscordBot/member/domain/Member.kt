@@ -70,10 +70,23 @@ class Member(
                 nickname = nickname
             )
         }
+
+
     }
 
     fun toDto(): MemberDto {
         return MemberDto(
+            id = this.id,
+            username = this.username,
+            userId = this.userId,
+            nickname = this.nickname,
+            level = this.level,
+            lastDailyReward = this.lastDailyReward
+        )
+    }
+
+    fun toEntity(): Member{
+        return Member(
             id = this.id,
             username = this.username,
             userId = this.userId,

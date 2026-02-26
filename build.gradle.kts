@@ -33,6 +33,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.mockito:mockito-core:5.20.0")
+	testRuntimeOnly("com.h2database:h2")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.json:json:20240303")
 	implementation("org.jsoup:jsoup:1.17.2")
@@ -53,6 +55,26 @@ allOpen {
 	annotation("jakarta.persistence.Embeddable")
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+tasks.named<Test>("test") {
+	useJUnitPlatform {
+		excludeTags("live")
+	}
 }
+
+tasks.register<Test>("liveTest") {
+	group = "verification"
+	description = "Runs live integration tests (tag: live)."
+	testClassesDirs = sourceSets["test"].output.classesDirs
+	classpath = sourceSets["test"].runtimeClasspath
+	useJUnitPlatform {
+		includeTags("live")
+	}
+	testLogging {
+		showStandardStreams = true
+		events("passed", "failed", "skipped")
+	}
+}
+
+
+
+
