@@ -67,6 +67,22 @@ class PubgService(
             .block() ?: error("Empty response from PUBG API")
     }
 
+    fun getPlayersMatchesInfo(matchId: String): String {
+        log.info("getPlayersMatchesInfo() called. matchId={}", matchId)
+        return client.get()
+            .uri { builder ->
+                builder.path("/shards/steam/matches/${matchId}")
+                    .build()
+            }
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { res ->
+                res.bodyToMono(String::class.java)
+                    .flatMap { Mono.error(RuntimeException("PUBG API error ${res.statusCode()}: $it")) }
+            }
+            .bodyToMono(String::class.java)
+            .block() ?: error("Empty response from PUBG API")
+    }
+
     @Transactional
     fun registrationPlayer(userId: String, playerId: String): PubgPlayers {
         log.info("registrationPlayer() called. userId={}, playerId={}", userId, playerId)
