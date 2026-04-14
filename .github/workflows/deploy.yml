@@ -49,7 +49,15 @@ jobs:
       # ✅ DEPLOY_HOST(Tailscale IP)에 대한 known_hosts 자동 생성
       - name: Add host to known_hosts
         run: |
-          ssh-keyscan -H "${{ vars.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          touch ~/.ssh/known_hosts
+          for i in 1 2 3 4 5; do
+            ssh-keyscan -T 10 -p "${{ vars.DEPLOY_PORT }}" -H "${{ vars.DEPLOY_HOST }}" >> ~/.ssh/known_hosts && break
+            if [ "$i" -eq 5 ]; then
+              echo "Failed to fetch SSH host key from ${{ vars.DEPLOY_HOST }}:${{ vars.DEPLOY_PORT }}"
+              exit 1
+            fi
+            sleep 5
+          done
           chmod 600 ~/.ssh/known_hosts
 
       - name: Upload jar
