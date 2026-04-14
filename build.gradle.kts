@@ -38,6 +38,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.json:json:20240303")
 	implementation("org.jsoup:jsoup:1.17.2")
+	implementation("org.apache.poi:poi-ooxml:5.2.5")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
