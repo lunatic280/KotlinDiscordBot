@@ -11,6 +11,9 @@ class MusicEventListener(
 ) : ListenerAdapter() {
 
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
+        // 봇 자신의 입장/퇴장 이벤트는 무시 (humanCount 오탐 방지)
+        if (event.entity.user == event.jda.selfUser) return
+
         val guild = event.guild
         val botChannel = guild.audioManager.connectedChannel ?: return
         if (event.channelLeft != botChannel && event.channelJoined != botChannel) return

@@ -17,6 +17,7 @@ class VoiceChannelManager(private val musicPlayerService: MusicPlayerService) {
     fun connect(guild: Guild, channel: AudioChannel) {
         cancelTimer(guild)
         val gmm = musicPlayerService.getOrCreate(guild)
+        guild.audioManager.isAutoReconnect = true
         guild.audioManager.sendingHandler = gmm.sendHandler
         if (!guild.audioManager.isConnected) {
             guild.audioManager.openAudioConnection(channel)
@@ -26,6 +27,10 @@ class VoiceChannelManager(private val musicPlayerService: MusicPlayerService) {
     fun disconnect(guild: Guild) {
         cancelTimer(guild)
         musicPlayerService.stop(guild)
+        // 자동재접속 차단 후 핸들러 제거 → closeAudioConnection 순서 중요
+        // 역순으로 하면 파괴된 player를 참조한 채 JDA가 재접속 시도하며 루프 발생
+        guild.audioManager.isAutoReconnect = false
+        guild.audioManager.sendingHandler = null
         guild.audioManager.closeAudioConnection()
         musicPlayerService.cleanup(guild)
     }
