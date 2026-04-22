@@ -26,18 +26,20 @@ class JoinCommand(
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val targetChannel = event.member?.voiceState?.channel as? AudioChannel
+
         if (targetChannel == null) {
-            event.replyEmbeds(errorEmbed("먼저 음성 채널에 입장해주세요.")).setEphemeral(true).queue()
+            event.replyEmbeds(errorEmbed("먼저 음성 채널에 입장해주세요."))
+                .setEphemeral(true)
+                .queue()
             return
         }
 
         val audioManager = guild.audioManager
-        val connectedChannel = audioManager.connectedChannel
         val connectionStatus = audioManager.connectionStatus
 
-        if (connectionStatus.isConnecting() && connectedChannel?.idLong != targetChannel.idLong) {
+        if (connectionStatus.name.startsWith("CONNECTING_")) {
             event.replyEmbeds(
-                successEmbed("입장", "이미 음성 채널 연결을 처리 중입니다. 잠시 후 다시 시도해주세요.")
+                errorEmbed("이미 음성 채널 연결을 처리 중입니다. 잠시 후 다시 시도해주세요.")
             ).setEphemeral(true).queue()
             return
         }
@@ -51,16 +53,19 @@ class JoinCommand(
 
         try {
             val result = voiceChannelManager.connect(guild, targetChannel)
+
             val message = when {
                 result.alreadyConnected ->
                     "이미 **${result.targetChannelName}** 채널에 연결되어 있습니다."
-                result.previousChannelName == null || result.previousChannelName == result.targetChannelName ->
+
+                result.previousChannelName == null ->
                     "**${result.targetChannelName}** 채널에 입장했습니다."
+
                 else ->
                     "**${result.previousChannelName}** 채널에서 **${result.targetChannelName}** 채널로 이동했습니다."
             }
 
-            event.replyEmbeds(successEmbed("입장", message)).setEphemeral(result.alreadyConnected).queue()
+            event.replyEmbeds(successEmbed("입장", message)).queue()
         } catch (e: Exception) {
             event.replyEmbeds(
                 errorEmbed("음성 채널 입장 중 오류가 발생했습니다: ${e.message ?: "알 수 없는 오류"}")
@@ -73,7 +78,4 @@ class JoinCommand(
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "입장")
-
-    private fun ConnectionStatus.isConnecting(): Boolean =
-        name.startsWith("CONNECTING_")
 }
