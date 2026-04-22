@@ -11,6 +11,7 @@ version = "0.0.1-SNAPSHOT"
 description = "Kotlin Discord Bot"
 
 val libdaveVersion = "ce725965e"
+val youtubeSourceVersion = "1.18.0"
 
 java {
 	toolchain {
@@ -44,7 +45,7 @@ dependencies {
 	implementation("org.jsoup:jsoup:1.17.2")
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
 	implementation("dev.arbjerg:lavaplayer:2.2.2")
-	implementation("dev.lavalink.youtube:v2:1.11.4")
+	implementation("dev.lavalink.youtube:v2:$youtubeSourceVersion")
 	implementation("moe.kyokobot.libdave:adapter-jda:$libdaveVersion")
 	implementation("moe.kyokobot.libdave:impl-jni:$libdaveVersion")
 	runtimeOnly("moe.kyokobot.libdave:natives-linux-x86-64:$libdaveVersion")
