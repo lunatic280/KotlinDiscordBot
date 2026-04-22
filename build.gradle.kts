@@ -19,6 +19,7 @@ java {
 repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/snapshot") }
+	maven { url = uri("https://maven.lavalink.dev/releases") }
 }
 
 dependencies {
@@ -39,6 +40,10 @@ dependencies {
 	implementation("org.json:json:20240303")
 	implementation("org.jsoup:jsoup:1.17.2")
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
+	implementation("dev.arbjerg:lavaplayer:2.2.2")
+	implementation("dev.lavalink.youtube:v2:1.11.4")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0")
+	implementation("com.google.cloud:google-cloud-speech:4.39.0")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
