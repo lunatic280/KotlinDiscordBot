@@ -20,7 +20,9 @@
       "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.hooks.ConnectionStatus)",
       "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.hooks.ConnectionListener)",
       "Bash(./gradlew -q dependencyInsight --dependency com.google.crypto.tink:tink --configuration runtimeClasspath)",
-      "Bash(./gradlew -q dependencyInsight --dependency club.minnced:opus-java --configuration runtimeClasspath)"
+      "Bash(./gradlew -q dependencyInsight --dependency club.minnced:opus-java --configuration runtimeClasspath)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.AudioModuleConfig)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.dave.DaveSessionFactory net.dv8tion.jda.api.audio.dave.PassthroughDaveSessionFactory)"
     ]
   }
 }

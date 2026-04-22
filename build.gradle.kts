@@ -10,6 +10,8 @@ group = "com.DiscordBot"
 version = "0.0.1-SNAPSHOT"
 description = "Kotlin Discord Bot"
 
+val libdaveVersion = "ce725965e"
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
@@ -19,6 +21,7 @@ java {
 repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/snapshot") }
+	maven { url = uri("https://maven.lavalink.dev/snapshots") }
 	maven { url = uri("https://maven.lavalink.dev/releases") }
 }
 
@@ -42,6 +45,10 @@ dependencies {
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
 	implementation("dev.arbjerg:lavaplayer:2.2.2")
 	implementation("dev.lavalink.youtube:v2:1.11.4")
+	implementation("moe.kyokobot.libdave:adapter-jda:$libdaveVersion")
+	implementation("moe.kyokobot.libdave:impl-jni:$libdaveVersion")
+	runtimeOnly("moe.kyokobot.libdave:natives-linux-x86-64:$libdaveVersion")
+	runtimeOnly("moe.kyokobot.libdave:natives-win-x86-64:$libdaveVersion")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0")
 	implementation("com.google.cloud:google-cloud-speech:4.39.0")
 

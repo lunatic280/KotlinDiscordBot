@@ -1,10 +1,14 @@
 package com.DiscordBot.KotlinDiscordBot.config
 
-import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import com.DiscordBot.KotlinDiscordBot.SlashCommandListener
+import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import com.DiscordBot.KotlinDiscordBot.music.listener.MusicEventListener
+import moe.kyokobot.libdave.NativeDaveFactory
+import moe.kyokobot.libdave.jda.LDJDADaveSessionFactory
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.audio.AudioModuleConfig
+import net.dv8tion.jda.api.audio.dave.DaveSessionFactory
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -19,20 +23,23 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class JdaConfig(
-    @Value("\${discord.token}") private val token: String
+    @Value("\${discord.token}") private val token: String,
 ) {
 
     @Bean
     fun jda(
         slashListener: SlashCommandListener,
         commands: List<SlashCommand>,
-        musicEventListener: MusicEventListener
+        musicEventListener: MusicEventListener,
+        daveSessionFactory: DaveSessionFactory,
     ): JDA {
         val jda = JDABuilder.createDefault(token)
+            .setAudioModuleConfig(
+                AudioModuleConfig()
+                    .withDaveSessionFactory(daveSessionFactory)
+            )
             .enableIntents(
                 GatewayIntent.GUILD_VOICE_STATES,
-                // 특권 인텐트 — Discord 개발자 포털에서 활성화 필요.
-                // MemberCachePolicy.VOICE 가 음성 채널 인원을 정확히 카운트하려면 필수.
                 GatewayIntent.GUILD_MEMBERS,
             )
             .enableCache(CacheFlag.VOICE_STATE)
@@ -42,13 +49,15 @@ class JdaConfig(
             .addEventListeners(slashListener, musicEventListener)
             .addEventListeners(object : ListenerAdapter() {
                 override fun onReady(event: ReadyEvent) {
-                    val commandData: List<SlashCommandData> = commands.map {
-                        it.getCommandData()
-                    }
+                    val commandData: List<SlashCommandData> = commands.map { it.getCommandData() }
                     event.jda.updateCommands().addCommands(commandData).queue()
                 }
             })
             .build()
         return jda
     }
+
+    @Bean
+    fun daveSessionFactory(): DaveSessionFactory =
+        LDJDADaveSessionFactory(NativeDaveFactory())
 }
