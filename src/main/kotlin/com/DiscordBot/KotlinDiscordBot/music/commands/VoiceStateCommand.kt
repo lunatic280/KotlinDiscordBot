@@ -42,7 +42,7 @@ class VoiceStateCommand : SlashCommand {
 
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
-            .setNameLocalization(DiscordLocale.KOREAN, "상태 확인")
+            .setNameLocalization(DiscordLocale.KOREAN, "상태확인")
             .setDescriptionLocalization(DiscordLocale.KOREAN, "보이스 상태 확인")
     }
 }
