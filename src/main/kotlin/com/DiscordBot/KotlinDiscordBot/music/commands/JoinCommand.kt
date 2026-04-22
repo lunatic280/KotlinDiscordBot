@@ -63,14 +63,15 @@ class JoinCommand(
             return
         }
 
+        // openAudioConnection 은 비동기이므로 3초 안에 응답하도록 defer 선행
+        event.deferReply().queue()
         try {
             voiceChannelManager.connect(guild, targetChannel)
-
-            event.replyEmbeds(
+            event.hook.sendMessageEmbeds(
                 successEmbed("입장", "**${targetChannel.name}** 채널에 입장했습니다.")
             ).queue()
         } catch (e: Exception) {
-            event.replyEmbeds(
+            event.hook.sendMessageEmbeds(
                 errorEmbed("음성 채널 입장 중 오류가 발생했습니다: ${e.message ?: "알 수 없는 오류"}")
             ).setEphemeral(true).queue()
         }

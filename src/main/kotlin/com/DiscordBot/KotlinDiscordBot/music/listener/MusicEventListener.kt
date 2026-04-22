@@ -19,10 +19,10 @@ class MusicEventListener(
         if (event.channelLeft != botChannel && event.channelJoined != botChannel) return
 
         val humanCount = botChannel.members.count { !it.user.isBot }
-//        if (humanCount == 0) {
-//            voiceChannelManager.scheduleAloneDisconnect(guild, 60)
-//        } else {
-//            voiceChannelManager.cancelTimer(guild)
-//        }
+        if (humanCount == 0) {
+            voiceChannelManager.scheduleAloneDisconnect(guild, 60)
+        } else {
+            voiceChannelManager.cancelAloneTimer(guild)
+        }
     }
 }
