@@ -1,8 +1,11 @@
 package com.DiscordBot.KotlinDiscordBot.music.service
 
 import jakarta.annotation.PreDestroy
+import net.dv8tion.jda.api.audio.hooks.ConnectionListener
+import net.dv8tion.jda.api.audio.hooks.ConnectionStatus
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -14,6 +17,7 @@ import kotlin.concurrent.withLock
 @Service
 class VoiceChannelManager(private val musicPlayerService: MusicPlayerService) {
 
+    private val log = LoggerFactory.getLogger(VoiceChannelManager::class.java)
     private val guildLocks = ConcurrentHashMap<Long, ReentrantLock>()
     private val disconnectScheduler = Executors.newSingleThreadScheduledExecutor()
     private val aloneTimers = ConcurrentHashMap<Long, ScheduledFuture<*>>()
@@ -28,8 +32,16 @@ class VoiceChannelManager(private val musicPlayerService: MusicPlayerService) {
         am.sendingHandler = gmm.sendHandler
         am.isAutoReconnect = true
 
+        // 루프 진단용: 모든 voice 상태 전환 로깅. 배포 후 /입장 실행 시 나오는 status 전이 패턴으로 원인 식별.
+        am.connectionListener = object : ConnectionListener {
+            override fun onStatusChange(status: ConnectionStatus) {
+                log.info("[voice] guild={} channel={} status={}", guild.idLong, channel.name, status)
+            }
+        }
+
         val already = am.isConnected && am.connectedChannel?.idLong == channel.idLong
         if (!already) {
+            log.info("[voice] openAudioConnection guild={} channel={}", guild.idLong, channel.name)
             am.openAudioConnection(channel)
         }
     }

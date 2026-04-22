@@ -11,7 +11,16 @@
       "Bash(gh pr create --title 'feat: 노래봇 MVP 기능 추가 \\(LavaPlayer + YouTube v2\\)' --body ' *)",
       "Bash(where gh *)",
       "Bash(winget list *)",
-      "Bash(./gradlew compileKotlin)"
+      "Bash(./gradlew compileKotlin)",
+      "Read(//c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/**)",
+      "Bash(unzip -p /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar META-INF/MANIFEST.MF)",
+      "Bash(unzip -l /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.AudioSendHandler)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.managers.AudioManager)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.hooks.ConnectionStatus)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.hooks.ConnectionListener)",
+      "Bash(./gradlew -q dependencyInsight --dependency com.google.crypto.tink:tink --configuration runtimeClasspath)",
+      "Bash(./gradlew -q dependencyInsight --dependency club.minnced:opus-java --configuration runtimeClasspath)"
     ]
   }
 }
