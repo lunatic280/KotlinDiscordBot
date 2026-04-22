@@ -35,15 +35,7 @@ class JoinCommand(
         val connectedChannel = audioManager.connectedChannel
         val connectionStatus = audioManager.connectionStatus
 
-        if (connectedChannel?.idLong == targetChannel.idLong) {
-            voiceChannelManager.connect(guild, targetChannel)
-            event.replyEmbeds(
-                successEmbed("입장", "이미 **${targetChannel.name}** 채널에 연결되어 있습니다.")
-            ).setEphemeral(true).queue()
-            return
-        }
-
-        if (connectionStatus.isConnecting()) {
+        if (connectionStatus.isConnecting() && connectedChannel?.idLong != targetChannel.idLong) {
             event.replyEmbeds(
                 successEmbed("입장", "이미 음성 채널 연결을 처리 중입니다. 잠시 후 다시 시도해주세요.")
             ).setEphemeral(true).queue()
@@ -58,19 +50,17 @@ class JoinCommand(
         }
 
         try {
-            voiceChannelManager.connect(guild, targetChannel)
-
-            if (connectedChannel != null) {
-                audioManager.openAudioConnection(targetChannel)
+            val result = voiceChannelManager.connect(guild, targetChannel)
+            val message = when {
+                result.alreadyConnected ->
+                    "이미 **${result.targetChannelName}** 채널에 연결되어 있습니다."
+                result.previousChannelName == null || result.previousChannelName == result.targetChannelName ->
+                    "**${result.targetChannelName}** 채널에 입장했습니다."
+                else ->
+                    "**${result.previousChannelName}** 채널에서 **${result.targetChannelName}** 채널로 이동했습니다."
             }
 
-            val message = if (connectedChannel == null) {
-                "**${targetChannel.name}** 채널에 입장했습니다."
-            } else {
-                "**${connectedChannel.name}** 채널에서 **${targetChannel.name}** 채널로 이동했습니다."
-            }
-
-            event.replyEmbeds(successEmbed("입장", message)).queue()
+            event.replyEmbeds(successEmbed("입장", message)).setEphemeral(result.alreadyConnected).queue()
         } catch (e: Exception) {
             event.replyEmbeds(
                 errorEmbed("음성 채널 입장 중 오류가 발생했습니다: ${e.message ?: "알 수 없는 오류"}")

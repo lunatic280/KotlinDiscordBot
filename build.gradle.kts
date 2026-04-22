@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-	implementation("net.dv8tion:JDA:5.4.0")
+	implementation("net.dv8tion:JDA:6.4.1")
 
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
