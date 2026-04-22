@@ -2,12 +2,14 @@ package com.DiscordBot.KotlinDiscordBot.config
 
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import com.DiscordBot.KotlinDiscordBot.SlashCommandListener
+import com.DiscordBot.KotlinDiscordBot.music.listener.MusicEventListener
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
+import net.dv8tion.jda.api.requests.GatewayIntent
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,10 +20,15 @@ class JdaConfig(
 ) {
 
     @Bean
-    fun jda(slashListener: SlashCommandListener, commands: List<SlashCommand>): JDA {
+    fun jda(
+        slashListener: SlashCommandListener,
+        commands: List<SlashCommand>,
+        musicEventListener: MusicEventListener
+    ): JDA {
         val jda = JDABuilder.createDefault(token)
+            .enableIntents(GatewayIntent.GUILD_VOICE_STATES)
             .setActivity(Activity.playing("Type /ping"))
-            .addEventListeners(slashListener)
+            .addEventListeners(slashListener, musicEventListener)
             .addEventListeners(object : ListenerAdapter() {
                 override fun onReady(event: ReadyEvent) {
                     val commandData: List<SlashCommandData> = commands.map {
