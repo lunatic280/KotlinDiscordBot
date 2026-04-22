@@ -18,87 +18,56 @@ class JoinCommand(
 ) : SlashCommand {
 
     override val name: String = "join"
-    override val description: String = "봇을 음성 채널에 입장"
+    override val description: String = "join voice channel"
 
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val member = event.member ?: return
         val selfMember = guild.selfMember
 
-        val memberVoiceState = member.voiceState
-        val targetChannel = memberVoiceState?.channel as? AudioChannel
-
-        // 1) 명령 사용자가 음성 채널에 있는지 확인
+        val targetChannel = member.voiceState?.channel as? AudioChannel
         if (targetChannel == null) {
-            event.replyEmbeds(
-                errorEmbed("먼저 음성 채널에 입장해주세요.")
-            ).setEphemeral(true).queue()
+            event.replyEmbeds(errorEmbed("먼저 음성 채널에 입장해주세요."))
+                .setEphemeral(true)
+                .queue()
             return
         }
 
-        // 2) 봇 권한 확인
+        // join에 필요한 최소 권한: VOICE_CONNECT
         if (!selfMember.hasPermission(targetChannel, Permission.VOICE_CONNECT)) {
-            event.replyEmbeds(
-                errorEmbed("봇에게 해당 음성 채널의 연결 권한(VOICE_CONNECT)이 없습니다.")
-            ).setEphemeral(true).queue()
-            return
-        }
-
-        if (!selfMember.hasPermission(targetChannel, Permission.VOICE_SPEAK)) {
-            event.replyEmbeds(
-                errorEmbed("봇에게 해당 음성 채널의 말하기 권한(VOICE_SPEAK)이 없습니다.")
-            ).setEphemeral(true).queue()
+            event.replyEmbeds(errorEmbed("봇에게 해당 음성 채널의 연결 권한이 없습니다."))
+                .setEphemeral(true)
+                .queue()
             return
         }
 
         val audioManager = guild.audioManager
-        val connectedChannel = audioManager.connectedChannel
+        val botChannel = audioManager.connectedChannel
 
-        // 3) 이미 같은 채널에 있으면 재연결하지 않음
-        if (connectedChannel?.idLong == targetChannel.idLong && audioManager.isConnected) {
+        // 이미 같은 채널
+        if (botChannel?.idLong == targetChannel.idLong && audioManager.isConnected) {
             event.replyEmbeds(
                 successEmbed("입장", "이미 **${targetChannel.name}** 채널에 연결되어 있습니다.")
             ).setEphemeral(true).queue()
             return
         }
 
-        // 4) 이미 다른 채널에 있으면 join에서는 이동하지 않음
-        //    필요하면 별도의 /move 명령으로 분리하는 편이 안전함
-        if (connectedChannel != null && audioManager.isConnected) {
+        // 이미 다른 채널
+        if (botChannel != null && audioManager.isConnected) {
             event.replyEmbeds(
                 errorEmbed(
-                    "봇이 이미 **${connectedChannel.name}** 채널에 연결되어 있습니다.\n" +
-                            "먼저 퇴장시키거나, 별도의 이동 명령을 사용해주세요."
+                    "봇이 이미 **${botChannel.name}** 채널에 연결되어 있습니다.\n" +
+                            "먼저 /leave 하거나, 별도 /move 명령을 사용해주세요."
                 )
-            ).setEphemeral(true).queue()
-            return
-        }
-
-        // 5) 연결 중이면 중복 요청 차단
-        if (audioManager.connectionStatus.name.startsWith("CONNECTING_")) {
-            event.replyEmbeds(
-                errorEmbed("현재 음성 채널 연결을 처리 중입니다. 잠시 후 다시 시도해주세요.")
             ).setEphemeral(true).queue()
             return
         }
 
         try {
-            val result = voiceChannelManager.connect(guild, targetChannel)
+            voiceChannelManager.connect(guild, targetChannel)
 
             event.replyEmbeds(
-                successEmbed(
-                    "입장",
-                    when {
-                        result.alreadyConnected ->
-                            "이미 **${result.targetChannelName}** 채널에 연결되어 있습니다."
-
-                        result.previousChannelName == null ->
-                            "**${result.targetChannelName}** 채널에 입장했습니다."
-
-                        else ->
-                            "**${result.previousChannelName}** 채널에서 **${result.targetChannelName}** 채널로 이동했습니다."
-                    }
-                )
+                successEmbed("입장", "**${targetChannel.name}** 채널에 입장했습니다.")
             ).queue()
         } catch (e: Exception) {
             event.replyEmbeds(
@@ -110,4 +79,5 @@ class JoinCommand(
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "입장")
+            .setDescriptionLocalization(DiscordLocale.KOREAN, "채널에 입장합니다.")
 }
