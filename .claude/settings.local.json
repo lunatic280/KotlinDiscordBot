@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "WebSearch",
+      "Bash(./gradlew clean *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'feat: 노래봇 MVP 기능 추가 \\(LavaPlayer + YouTube v2\\)' --body ' *)",
+      "Bash(where gh *)",
+      "Bash(winget list *)"
+    ]
+  }
+}
