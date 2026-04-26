@@ -4,37 +4,70 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import dev.lavalink.youtube.YoutubeAudioSourceManager
-import dev.lavalink.youtube.clients.TvHtml5Simply
+import dev.lavalink.youtube.YoutubeSourceOptions
 import dev.lavalink.youtube.clients.Web
-import dev.lavalink.youtube.clients.WebEmbedded
+import dev.lavalink.youtube.clients.AndroidVrWithThumbnail
+import dev.lavalink.youtube.clients.MWebWithThumbnail
+import dev.lavalink.youtube.clients.MusicWithThumbnail
+import dev.lavalink.youtube.clients.WebEmbeddedWithThumbnail
+import dev.lavalink.youtube.clients.WebWithThumbnail
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class MusicConfig {
+class MusicConfig(
+    @Value("\${youtube.po-token:}") private val poToken: String,
+    @Value("\${youtube.visitor-data:}") private val visitorData: String,
+    @Value("\${youtube.remote-cipher.url:}") private val remoteCipherUrl: String,
+    @Value("\${youtube.remote-cipher.password:}") private val remoteCipherPassword: String,
+    @Value("\${youtube.remote-cipher.user-agent:}") private val remoteCipherUserAgent: String,
+    @Value("\${youtube.oauth.refresh-token:}") private val oauthRefreshToken: String,
+) {
 
     @Bean
     fun audioPlayerManager(): AudioPlayerManager {
         val manager = DefaultAudioPlayerManager()
 
-        // 1) youtube-source v2 등록.
-        //    - 1번째 인자 allowSearch=true: "ytsearch:" 스킴을 처리할 수 있게 한다 (MusicPlayerService.load 가 사용).
-        //    - 클라이언트 순서는 우선순위. Web(메인) → TvHtml5Simply(폴백) → WebEmbedded(임베드 한정 폴백).
-        //      TvHtml5Embedded는 1.18.0에서 EOL로 제거되었으므로 사용하지 않는다.
-        val ytManager = YoutubeAudioSourceManager(
-            /* allowSearch = */ true,
-            Web(),
-            TvHtml5Simply(),
-            WebEmbedded()
-        )
+        if (poToken.isNotBlank() && visitorData.isNotBlank()) {
+            Web.setPoTokenAndVisitorData(poToken, visitorData)
+        }
+
+        val ytManager: YoutubeAudioSourceManager = if (remoteCipherUrl.isNotBlank()) {
+            val opts = YoutubeSourceOptions()
+                .setAllowSearch(true)
+                .setAllowDirectVideoIds(true)
+                .setAllowDirectPlaylistIds(true)
+                .setRemoteCipher(
+                    remoteCipherUrl,
+                    remoteCipherPassword.ifBlank { null },
+                    remoteCipherUserAgent.ifBlank { null },
+                )
+            YoutubeAudioSourceManager(
+                opts,
+                MusicWithThumbnail(),
+                AndroidVrWithThumbnail(),
+                MWebWithThumbnail(),
+                WebWithThumbnail(),
+                WebEmbeddedWithThumbnail(),
+            )
+        } else {
+            YoutubeAudioSourceManager(
+                /* allowSearch = */ true,
+                MusicWithThumbnail(),
+                AndroidVrWithThumbnail(),
+                MWebWithThumbnail(),
+                WebWithThumbnail(),
+                WebEmbeddedWithThumbnail(),
+            )
+        }
+
+        // if (oauthRefreshToken.isNotBlank()) {
+        //     ytManager.useOauth2(oauthRefreshToken, /* skipInitialization = */ true)
+        // }
+
         manager.registerSourceManager(ytManager)
-
-        // 2) 비-YouTube remote source(SoundCloud / Bandcamp / Vimeo / Twitch / HTTP / Beam 등)를 등록.
-        //    lavaplayer 2.2.x 의 기본 YoutubeAudioSourceManager(com.sedmelluq...) 클래스는
-        //    이미 패키지에서 제거되었으므로 exclusion 인자를 넘기지 않는다.
-        //    인자 없이 호출하면 기본 remote source 묶음이 안전하게 등록된다.
         AudioSourceManagers.registerRemoteSources(manager)
-
         return manager
     }
 }
