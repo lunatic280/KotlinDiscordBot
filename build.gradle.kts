@@ -44,7 +44,7 @@ dependencies {
 	implementation("org.json:json:20240303")
 	implementation("org.jsoup:jsoup:1.17.2")
 	implementation("org.apache.poi:poi-ooxml:5.2.5")
-	implementation("dev.arbjerg:lavaplayer:2.2.2")
+	implementation("dev.arbjerg:lavaplayer:2.2.6")
 	implementation("dev.lavalink.youtube:v2:$youtubeSourceVersion")
 	implementation("moe.kyokobot.libdave:adapter-jda:$libdaveVersion")
 	implementation("moe.kyokobot.libdave:impl-jni:$libdaveVersion")
