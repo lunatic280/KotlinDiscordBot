@@ -26,6 +26,7 @@ class JdaConfig(
     @Value("\${discord.token}") private val token: String,
 ) {
 
+    // Discord JDA 클라이언트를 구성하고 슬래시 명령과 음악 이벤트 리스너를 등록하는 함수입니다.
     @Bean
     fun jda(
         slashListener: SlashCommandListener,
@@ -48,6 +49,7 @@ class JdaConfig(
             .setActivity(Activity.playing("Type /ping"))
             .addEventListeners(slashListener, musicEventListener)
             .addEventListeners(object : ListenerAdapter() {
+                // JDA 준비 완료 시 현재 애플리케이션의 슬래시 명령들을 Discord에 갱신하는 함수입니다.
                 override fun onReady(event: ReadyEvent) {
                     val commandData: List<SlashCommandData> = commands.map { it.getCommandData() }
                     event.jda.updateCommands().addCommands(commandData).queue()
@@ -57,6 +59,7 @@ class JdaConfig(
         return jda
     }
 
+    // Discord 음성 암호화에 사용할 Dave 세션 팩토리 빈을 생성하는 함수입니다.
     @Bean
     fun daveSessionFactory(): DaveSessionFactory =
         LDJDADaveSessionFactory(NativeDaveFactory())

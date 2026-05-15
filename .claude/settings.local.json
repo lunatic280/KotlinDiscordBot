@@ -29,7 +29,11 @@
       "Bash(curl -s -L \"https://api.github.com/repos/lavalink-devs/youtube-source/contents/common/src/main/java/dev/lavalink/youtube/clients?ref=1.18.0\")",
       "Bash(curl -s -L \"https://raw.githubusercontent.com/lavalink-devs/youtube-source/1.18.0/common/src/main/java/dev/lavalink/youtube/YoutubeAudioSourceManager.java\")",
       "Bash(curl *)",
-      "Bash(jar tf *)"
+      "Bash(jar tf *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:jda.wiki)",
+      "WebFetch(domain:discord.com)",
+      "WebFetch(domain:docs.discord.com)"
     ]
   }
 }

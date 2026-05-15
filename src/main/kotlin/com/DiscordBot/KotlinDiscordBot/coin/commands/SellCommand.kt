@@ -26,6 +26,7 @@ class SellCommand(
     override val name: String = "sell"
     override val description: String = "sell coin"
 
+    // 코인 판매 명령 입력을 검증하고 현재가 기준으로 보유 코인을 매도하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val inputCoinName = event.getOption("name")?.asString?.trim()
         val inputCoinCount = event.getOption("count")?.asString?.trim()
@@ -137,6 +138,7 @@ class SellCommand(
             )
     }
 
+    // 코인 판매 슬래시 명령의 이름, 설명, 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "코인판매")

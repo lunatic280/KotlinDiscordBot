@@ -15,6 +15,7 @@ data class TickerDto(
     val market: String
 )
 
+// API 응답의 상승률 필드를 퍼센트 값으로 변환해 보여주는 확장 함수입니다.
 fun TickerDto.showRate(): Double? {
     signed_change_rate?.let { return it * 100 }
 

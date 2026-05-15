@@ -15,6 +15,7 @@ class PauseCommand(private val musicPlayerService: MusicPlayerService) : SlashCo
     override val name = "pause"
     override val description = "일시정지"
 
+    // 현재 재생 중인 음악을 일시정지하는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         if (musicPlayerService.current(guild) == null) {
@@ -25,6 +26,7 @@ class PauseCommand(private val musicPlayerService: MusicPlayerService) : SlashCo
         event.replyEmbeds(successEmbed("일시정지", "⏸ 재생을 일시정지했습니다.")).queue()
     }
 
+    // 일시정지 슬래시 명령의 이름을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description).setNameLocalization(DiscordLocale.KOREAN, "일시정지")
 }

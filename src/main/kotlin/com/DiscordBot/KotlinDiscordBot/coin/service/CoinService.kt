@@ -23,6 +23,7 @@ class CoinService(
 
     private val log = LoggerFactory.getLogger(CoinService::class.java)
 
+    // 단일 마켓의 현재 코인 시세를 빗썸 API에서 조회하는 함수입니다.
     fun getCoin(market: Market): Mono<TickerDto> {
         return webClient.get()
             .uri { uriBuilder ->
@@ -36,6 +37,7 @@ class CoinService(
             .doOnError { error -> log.warn("코인 시세 조회 실패: ${market.code}", error) }
     }
 
+    // 여러 마켓의 현재가를 한 번에 조회해 마켓별 가격 맵으로 반환하는 함수입니다.
     fun getCoinList(markets: List<Market>): Mono<Map<Market, Long>> {
         if (markets.isEmpty()) {
             return Mono.just(emptyMap())
@@ -63,6 +65,7 @@ class CoinService(
             .doOnError { error -> log.warn("코인 시세 일괄 조회 실패", error) }
     }
 
+    // 사용자의 지갑 현금을 차감하고 코인 포지션을 생성하거나 누적하는 구매 처리 함수입니다.
     @Transactional
     fun buyCoin(dto: MemberDto, market: Market, count: Long, cost: Long): PositionDto {
 
@@ -104,6 +107,7 @@ class CoinService(
         return resultPosition.toDto()
     }
 
+    // 사용자의 보유 코인을 매도하고 현금을 증가시키며 포지션을 갱신하는 판매 처리 함수입니다.
     @Transactional
     fun sellCoin(dto: MemberDto, market: Market, count: Long, cost: Long): PositionDto {
 

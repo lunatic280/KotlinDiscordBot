@@ -24,6 +24,7 @@ class PlayCommand(
     override val name = "play"
     override val description = "음악 재생"
 
+    // URL 또는 검색어로 음악을 로드하고 음성 채널에서 재생하거나 대기열에 추가하는 명령 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val channel = event.member?.voiceState?.channel as? AudioChannel
@@ -66,6 +67,7 @@ class PlayCommand(
         }
     }
 
+    // 음악 재생 슬래시 명령의 검색어 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "재생")

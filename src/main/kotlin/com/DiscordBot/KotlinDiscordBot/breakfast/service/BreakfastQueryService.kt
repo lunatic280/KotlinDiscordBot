@@ -11,6 +11,7 @@ class BreakfastQueryService(
     private val cnuBreakfastClient: CnuBreakfastClient
 ) {
 
+    // 선택된 대학에 맞는 조식 클라이언트로 조회를 위임하는 함수입니다.
     fun fetch(university: BreakfastUniversity, targetDate: LocalDate): BreakfastInfo {
         return when (university) {
             BreakfastUniversity.CATHOLIC -> catholicBreakfastClient.fetch(targetDate)

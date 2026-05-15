@@ -19,6 +19,7 @@ class QueueCommand(private val musicPlayerService: MusicPlayerService) : SlashCo
     override val name = "queue"
     override val description = "대기열 목록"
 
+    // 현재 재생 곡과 대기열 목록을 Discord 임베드로 보여주는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val gmm = musicPlayerService.getOrCreate(guild)
@@ -50,6 +51,7 @@ class QueueCommand(private val musicPlayerService: MusicPlayerService) : SlashCo
         event.replyEmbeds(embed.build()).queue()
     }
 
+    // 대기열 조회 슬래시 명령의 이름을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description).setNameLocalization(DiscordLocale.KOREAN, "대기열")
 }

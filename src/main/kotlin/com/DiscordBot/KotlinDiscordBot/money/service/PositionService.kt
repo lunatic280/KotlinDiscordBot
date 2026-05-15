@@ -12,6 +12,7 @@ class PositionService(
     private val positionRepository: PositionRepository
 ) {
 
+    // 지갑 ID로 보유 마켓과 수량 목록을 조회하는 함수입니다.
     fun getPositionMarketList(walletId: Long): List<PositionMarketDto> {
         val findWallet = positionRepository.findByWalletId(walletId)
         val makeList = findWallet.map { PositionMarketDto(it.market, it.getMarketCount()) }

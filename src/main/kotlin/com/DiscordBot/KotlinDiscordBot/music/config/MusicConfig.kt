@@ -25,6 +25,7 @@ class MusicConfig(
     @Value("\${youtube.oauth.refresh-token:}") private val oauthRefreshToken: String,
 ) {
 
+    // Lavaplayer와 YouTube 소스 매니저를 구성해 음악 재생 매니저 빈을 생성하는 함수입니다.
     @Bean
     fun audioPlayerManager(): AudioPlayerManager {
         val manager = DefaultAudioPlayerManager()

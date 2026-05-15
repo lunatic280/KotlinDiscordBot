@@ -47,18 +47,23 @@ class Member(
 ) {
 
     //레벨 관련 메서드
+    // 현재 멤버 레벨 값을 반환하는 함수입니다.
     fun getLevel() = level
+    // 멤버 레벨을 1 증가시키는 내부 함수입니다.
     private fun levelUp() {
         level += 1
     }
 
     //닉네임 관련 메서드
+    // 현재 멤버 닉네임을 반환하는 함수입니다.
     fun getNickname() = nickname
+    // 멤버 닉네임을 새 값으로 변경하는 함수입니다.
     fun updateNickname(newNickname: String) {
         nickname = newNickname
     }
 
     companion object {
+        // 신규 멤버 엔티티를 생성하는 팩토리 함수입니다.
         fun create(
             username: String,
             userId: String,
@@ -74,6 +79,7 @@ class Member(
 
     }
 
+    // 멤버 엔티티를 외부 전달용 DTO로 변환하는 함수입니다.
     fun toDto(): MemberDto {
         return MemberDto(
             id = this.id,
@@ -85,6 +91,7 @@ class Member(
         )
     }
 
+    // 현재 멤버 값을 기반으로 새 엔티티 인스턴스를 만드는 함수입니다.
     fun toEntity(): Member{
         return Member(
             id = this.id,

@@ -15,6 +15,7 @@ class SkipCommand(private val musicPlayerService: MusicPlayerService) : SlashCom
     override val name = "skip"
     override val description = "현재 곡 스킵"
 
+    // 현재 재생 중인 곡을 건너뛰는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val skipped = musicPlayerService.skip(guild)
@@ -25,6 +26,7 @@ class SkipCommand(private val musicPlayerService: MusicPlayerService) : SlashCom
         event.replyEmbeds(successEmbed("스킵", "⏭ **${skipped.info.title}** 을(를) 스킵했습니다.")).queue()
     }
 
+    // 스킵 슬래시 명령의 이름을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description).setNameLocalization(DiscordLocale.KOREAN, "스킵")
 }

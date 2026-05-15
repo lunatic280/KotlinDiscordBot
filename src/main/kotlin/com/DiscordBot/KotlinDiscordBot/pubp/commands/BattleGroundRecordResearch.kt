@@ -19,6 +19,7 @@ class BattleGroundRecordResearch(
     override val name: String = "battlegroundrecordresearch"
     override val description: String = "research match information"
 
+    // 배틀그라운드 최근 매치 조회 명령의 등록 여부를 확인하고 현재 구현 상태를 안내하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val userId = event.user.idLong
         val existUser = memberService.existsMember(userId.toString())
@@ -31,6 +32,7 @@ class BattleGroundRecordResearch(
         }
     }
 
+    // 배틀그라운드 매치 검색 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "매치검색")

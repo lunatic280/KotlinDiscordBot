@@ -15,6 +15,7 @@ class ResumeCommand(private val musicPlayerService: MusicPlayerService) : SlashC
     override val name = "resume"
     override val description = "재생 재개"
 
+    // 일시정지된 음악 재생을 다시 시작하는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         if (!musicPlayerService.isPaused(guild)) {
@@ -25,6 +26,7 @@ class ResumeCommand(private val musicPlayerService: MusicPlayerService) : SlashC
         event.replyEmbeds(successEmbed("재개", "▶ 재생을 재개합니다.")).queue()
     }
 
+    // 재개 슬래시 명령의 이름을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description).setNameLocalization(DiscordLocale.KOREAN, "재개")
 }

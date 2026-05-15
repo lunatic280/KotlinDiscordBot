@@ -18,6 +18,7 @@ class CnuBreakfastClient(
     private val log = LoggerFactory.getLogger(CnuBreakfastClient::class.java)
     private val client = webClientBuilder.build()
 
+    // 충남대학교 식단 페이지에서 지정 날짜의 천 원 조식 정보를 가져오는 함수입니다.
     fun fetch(targetDate: LocalDate): BreakfastInfo {
         val menuUrl = "$CNU_MENU_URL?searchYmd=${targetDate.format(CNU_DATE_FORMAT)}&searchLang=OCL04.10&searchView=cafeteria&searchCafeteria=OCL03.02"
         val html = client.get()
@@ -59,6 +60,7 @@ class CnuBreakfastClient(
         )
     }
 
+    // 식단 표 헤더에서 식당 이름 목록을 추출하는 함수입니다.
     internal fun extractHeaderNames(table: Element): List<String> {
         return table.select("thead tr").lastOrNull()
             ?.select("th")
@@ -68,6 +70,7 @@ class CnuBreakfastClient(
             ?: emptyList()
     }
 
+    // 식단 셀의 줄바꿈 구분 HTML을 메뉴 항목 목록으로 분리하는 함수입니다.
     internal fun extractMenuItems(menuCell: Element): List<String> {
         val paragraph = menuCell.selectFirst("p")
         if (paragraph == null) {
@@ -80,6 +83,7 @@ class CnuBreakfastClient(
             .filter { it.isNotBlank() }
     }
 
+    // rowspan과 colspan이 있는 HTML 표를 좌표로 접근 가능한 그리드로 변환하는 함수입니다.
     internal fun buildTableGrid(rows: List<Element>, totalColumns: Int): List<List<TableCell>> {
         val pendingRowspans = mutableMapOf<Int, ActiveCell>()
         val grid = mutableListOf<List<TableCell>>()

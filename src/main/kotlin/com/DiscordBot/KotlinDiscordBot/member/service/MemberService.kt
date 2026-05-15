@@ -20,10 +20,12 @@ class MemberService(
     private val log = LoggerFactory.getLogger(MemberService::class.java)
 
 
+    // Discord userId로 등록된 멤버가 있는지 확인하는 함수입니다.
     fun existsMember(userId: String): Boolean {
         return memberRepository.existsByUserId(userId)
     }
 
+    // Discord userId에 해당하는 멤버 정보를 조회하는 함수입니다.
     fun getMember(userId: String): MemberDto {
         val get = memberRepository.findByUserId(userId)
         log.info("getMember() -> ${get}")
@@ -31,6 +33,7 @@ class MemberService(
     }
 
 
+    // 새 멤버를 등록하고 기본 지갑을 함께 생성하는 함수입니다.
     @Transactional
     fun memberRegistration(memberCreateDto: MemberCreateDto): MemberDto? {
         if (memberRepository.existsByUserId(memberCreateDto.userId)) {

@@ -19,6 +19,7 @@ class GuildMusicManager(
         player.addListener(scheduler)
     }
 
+    // 길드 음악 플레이어를 종료하고 대기열을 비우는 함수입니다.
     fun shutdown() {
         player.destroy()
         queue.clear()

@@ -20,6 +20,7 @@ class WealthUpdateScheduler(
     private val log = LoggerFactory.getLogger(WealthUpdateScheduler::class.java)
 
 
+    // 모든 지갑의 코인 평가액과 총재산을 주기적으로 재계산하는 스케줄러 함수입니다.
     @Scheduled(fixedRate = 60_000) //1분
     @Transactional
     fun updateAllWealth() {

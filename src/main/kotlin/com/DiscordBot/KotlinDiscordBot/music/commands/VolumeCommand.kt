@@ -17,6 +17,7 @@ class VolumeCommand(private val musicPlayerService: MusicPlayerService) : SlashC
     override val name = "volume"
     override val description = "볼륨 설정 (0~150)"
 
+    // 입력된 볼륨 값을 검증하고 음악 플레이어 볼륨을 변경하는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val level = event.getOption("level")?.asInt
@@ -28,6 +29,7 @@ class VolumeCommand(private val musicPlayerService: MusicPlayerService) : SlashC
         event.replyEmbeds(successEmbed("볼륨 변경", "🔊 볼륨을 **$level**으로 설정했습니다.")).queue()
     }
 
+    // 볼륨 설정 슬래시 명령의 숫자 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "볼륨")

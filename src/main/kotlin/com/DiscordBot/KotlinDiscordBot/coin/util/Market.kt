@@ -425,8 +425,11 @@ enum class Market(
     USDT_AMP("USDT-AMP", "앰프", "Amp");
 
     companion object {
+        // 마켓 코드로 Market enum 값을 찾는 함수입니다.
         fun fromCode(code: String): Market? = values().find { it.code == code }
+        // 한글 코인명으로 Market enum 값을 찾는 함수입니다.
         fun fromKName(name: String): Market? = values().find { it.koreanName == name }
+        // 영문 코인명으로 Market enum 값을 찾는 함수입니다.
         fun fromUName(name: String): Market? = values().find { it.englishName == name }
     }
 }

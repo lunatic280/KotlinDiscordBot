@@ -13,6 +13,7 @@ class TrackScheduler(
     private val onNothingLeft: () -> Unit,
 ) : AudioEventAdapter() {
 
+    // 트랙 종료 시 반복 모드에 맞춰 다음 트랙을 재생하거나 종료 콜백을 실행하는 함수입니다.
     override fun onTrackEnd(player: AudioPlayer, track: AudioTrack, endReason: AudioTrackEndReason) {
         if (!endReason.mayStartNext) return
         val next = when (queue.loopMode) {

@@ -16,6 +16,7 @@ class MemberRegistrationCommand(
     override val name: String = "registration"
     override val description: String = "member registration"
 
+    // Discord 사용자 정보를 기반으로 멤버 등록을 처리하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val user = event.user
         val member = event.member
@@ -40,6 +41,7 @@ class MemberRegistrationCommand(
         event.reply("등록에 성공했습니다.").setEphemeral(true).queue()
     }
 
+    // 멤버 등록 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "등록")

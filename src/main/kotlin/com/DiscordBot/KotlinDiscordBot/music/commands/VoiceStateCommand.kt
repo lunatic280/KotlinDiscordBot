@@ -14,6 +14,7 @@ class VoiceStateCommand : SlashCommand {
 
     override val description: String = "check voice state"
 
+    // 사용자와 봇의 현재 음성 채널 연결 상태를 응답하는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild
         val member = event.member
@@ -42,6 +43,7 @@ class VoiceStateCommand : SlashCommand {
             .setEphemeral(true).queue()
     }
 
+    // 음성 상태 확인 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "상태확인")

@@ -23,6 +23,7 @@ open class CatholicBreakfastClient(
     private val client = webClientBuilder.build()
     private val monthCache = ConcurrentHashMap<YearMonth, CachedCatholicMonth>()
 
+    // 가톨릭대 공지와 첨부 엑셀을 기반으로 지정 날짜의 조식 정보를 조회하는 함수입니다.
     fun fetch(targetDate: LocalDate): BreakfastInfo {
         val monthlySource = resolveMonthlySource(targetDate)
         val menuItems = workbookMenuParser.extractMenuItems(monthlySource.workbookBytes, targetDate)
@@ -40,6 +41,7 @@ open class CatholicBreakfastClient(
         )
     }
 
+    // 월별 조식 원본 데이터를 캐시에서 찾거나 새로 불러오는 함수입니다.
     private fun resolveMonthlySource(targetDate: LocalDate): CatholicMonthlySource {
         val monthKey = YearMonth.from(targetDate)
         val now = currentInstant()
@@ -65,10 +67,13 @@ open class CatholicBreakfastClient(
         }
     }
 
+    // 현재 시각을 반환해 캐시 만료 판단에 사용하는 함수입니다.
     protected open fun currentInstant(): Instant = Instant.now()
 
+    // 가톨릭대 조식 원본 캐시의 새로고침 간격을 반환하는 함수입니다.
     protected open fun refreshInterval(): Duration = DEFAULT_REFRESH_INTERVAL
 
+    // 지정 날짜가 속한 월의 공지 본문과 첨부 엑셀을 내려받는 함수입니다.
     protected open fun loadMonthlySource(targetDate: LocalDate): CatholicMonthlySource {
         val article = findMonthlyArticle(targetDate)
         val articleDocument = fetchDocument(article.articleUrl)
@@ -94,6 +99,7 @@ open class CatholicBreakfastClient(
         )
     }
 
+    // 대상 월의 조식 메뉴 공지 글을 목록 페이지에서 찾는 함수입니다.
     private fun findMonthlyArticle(targetDate: LocalDate): CatholicArticle {
         val searchUrl = "$CATHOLIC_BOARD_URL?mode=list&srCategoryId=20&srSearchKey=title&srSearchVal=천원의 아침밥&article.offset=0&articleLimit=20"
         val searchDocument = fetchDocument(searchUrl)
@@ -109,6 +115,7 @@ open class CatholicBreakfastClient(
         return CatholicArticle(articleTitle, articleUrl)
     }
 
+    // URL의 HTML을 가져와 Jsoup Document로 파싱하는 함수입니다.
     private fun fetchDocument(url: String): Document {
         val html = client.get()
             .uri(url)
@@ -119,12 +126,14 @@ open class CatholicBreakfastClient(
         return Jsoup.parse(html, url)
     }
 
+    // 공지 본문 텍스트에서 특정 라벨 뒤의 상세 값을 추출하는 함수입니다.
     private fun extractDetail(text: String, label: String): String {
         val regex = Regex("$label\\s*:\\s*(.+?)(?=\\s*[0-9]+\\.|$)")
         return regex.find(text)?.groupValues?.get(1)?.trim()
             ?: throw IllegalStateException("Catholic article detail missing: $label")
     }
 
+    // 공지 본문에 있는 별표 안내 문구들을 선택적으로 추출하는 함수입니다.
     private fun extractOptionalNotes(text: String): String? {
         val regex = Regex("\\*\\s*(.+?)(?=\\*|$)")
         return regex.findAll(text)
@@ -134,10 +143,12 @@ open class CatholicBreakfastClient(
             .ifBlank { null }
     }
 
+    // 캐시된 월별 조식 원본이 갱신 주기를 넘겼는지 판단하는 함수입니다.
     private fun needsRefresh(cached: CachedCatholicMonth, now: Instant): Boolean {
         return now.isAfter(cached.fetchedAt.plus(refreshInterval()))
     }
 
+    // 공지 첨부 링크를 절대 URL로 정규화하는 함수입니다.
     private fun absoluteUrl(href: String): String {
         val normalized = href.replace("&amp;", "&")
         return when {

@@ -20,6 +20,7 @@ class JoinCommand(
     override val name: String = "join"
     override val description: String = "join voice channel"
 
+    // 사용자가 있는 음성 채널로 봇을 입장시키는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val member = event.member ?: return
@@ -77,6 +78,7 @@ class JoinCommand(
         }
     }
 
+    // 음성 채널 입장 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "입장")

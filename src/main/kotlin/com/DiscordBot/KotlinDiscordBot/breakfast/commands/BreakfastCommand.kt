@@ -25,6 +25,7 @@ class BreakfastCommand(
     override val name: String = "breakfast"
     override val description: String = "lookup KRW 1,000 breakfast menus"
 
+    // 조식 조회 명령 옵션을 검증하고 대상 날짜의 조식 정보를 비동기로 응답하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val universityOption = event.getOption("university")?.asString
         if (universityOption.isNullOrBlank()) {
@@ -60,6 +61,7 @@ class BreakfastCommand(
         }
     }
 
+    // 조식 조회 슬래시 명령의 대학과 날짜 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .addOptions(
@@ -70,6 +72,7 @@ class BreakfastCommand(
             )
     }
 
+    // 조회된 조식 정보를 Discord 메시지 본문 문자열로 포맷하는 함수입니다.
     private fun formatReply(info: BreakfastInfo): String {
         val menu = info.menuItems.joinToString("\n") { "- $it" }
         val sources = info.sourceUrls.joinToString("\n") { "- $it" }

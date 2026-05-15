@@ -12,6 +12,7 @@ import java.util.Locale
 @Component
 class CatholicWorkbookMenuParser {
 
+    // 가톨릭대 월간 식단 엑셀에서 지정 날짜의 메뉴 항목을 추출하는 함수입니다.
     fun extractMenuItems(workbookBytes: ByteArray, targetDate: LocalDate): List<String> {
         ByteArrayInputStream(workbookBytes).use { input ->
             WorkbookFactory.create(input).use { workbook ->
@@ -50,11 +51,13 @@ class CatholicWorkbookMenuParser {
         throw IllegalArgumentException("Menu not found in workbook for $targetDate")
     }
 
+    // 셀 텍스트가 대상 날짜 토큰을 포함하는지 검사하는 함수입니다.
     private fun matchesDateToken(cellText: String, dateToken: String): Boolean {
         val normalized = cellText.replace(" ", "")
         return normalized.contains(dateToken)
     }
 
+    // 병합 셀을 고려해 지정 좌표의 표시 텍스트를 읽는 함수입니다.
     private fun resolveMergedText(
         sheet: org.apache.poi.ss.usermodel.Sheet,
         rowIndex: Int,
@@ -74,6 +77,7 @@ class CatholicWorkbookMenuParser {
         return formatter.formatCellValue(cell, evaluator).trim()
     }
 
+    // 지정 셀 좌표가 속한 병합 영역을 찾는 함수입니다.
     private fun findMergedRegion(
         sheet: org.apache.poi.ss.usermodel.Sheet,
         rowIndex: Int,

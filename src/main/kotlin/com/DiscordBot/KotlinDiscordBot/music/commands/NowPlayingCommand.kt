@@ -17,6 +17,7 @@ class NowPlayingCommand(private val musicPlayerService: MusicPlayerService) : Sl
     override val name = "nowplaying"
     override val description = "현재 재생 중인 곡"
 
+    // 현재 재생 중인 곡의 제목, 진행 시간, 채널을 보여주는 명령 처리 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild ?: return
         val track = musicPlayerService.current(guild)
@@ -37,6 +38,7 @@ class NowPlayingCommand(private val musicPlayerService: MusicPlayerService) : Sl
         ).queue()
     }
 
+    // 현재 곡 조회 슬래시 명령의 이름을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData =
         Commands.slash(name, description).setNameLocalization(DiscordLocale.KOREAN, "지금곡")
 }

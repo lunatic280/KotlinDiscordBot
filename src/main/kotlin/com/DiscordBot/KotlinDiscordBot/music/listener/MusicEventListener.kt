@@ -10,6 +10,7 @@ class MusicEventListener(
     private val voiceChannelManager: VoiceChannelManager
 ) : ListenerAdapter() {
 
+    // 음성 채널 인원 변화를 감지해 봇 혼자 남으면 자동 퇴장을 예약하는 함수입니다.
     override fun onGuildVoiceUpdate(event: GuildVoiceUpdateEvent) {
         // 봇 자신의 입장/퇴장 이벤트는 무시 (humanCount 오탐 방지)
         if (event.entity.user == event.jda.selfUser) return

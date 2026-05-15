@@ -29,6 +29,7 @@ class PubgService(
         .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.api+json")
         .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $apiKey")
         .build()
+    // 등록된 사용자의 PUBG 플레이어 ID로 플레이어 정보를 API에서 조회하는 함수입니다.
     fun getPlayersInfo(userId: String): String {
         log.info("getPlayersInfo() called. userId={}", userId)
         val player = pubgRepository.findByMember_UserId(userId)
@@ -50,6 +51,7 @@ class PubgService(
             .block() ?: error("Empty response from PUBG API")
     }
 
+    // PUBG 플레이어 이름으로 플레이어 정보를 API에서 조회하는 함수입니다.
     fun getPlayersByName(playerName: String): String {
         log.info("getPlayersByName() called. playerName={}", playerName)
         return client.get()
@@ -67,6 +69,7 @@ class PubgService(
             .block() ?: error("Empty response from PUBG API")
     }
 
+    // PUBG 매치 ID로 매치 상세 정보를 API에서 조회하는 함수입니다.
     fun getPlayersMatchesInfo(matchId: String): String {
         log.info("getPlayersMatchesInfo() called. matchId={}", matchId)
         return client.get()
@@ -83,6 +86,7 @@ class PubgService(
             .block() ?: error("Empty response from PUBG API")
     }
 
+    // Discord 사용자와 PUBG 플레이어 ID를 연결해 저장하는 등록 함수입니다.
     @Transactional
     fun registrationPlayer(userId: String, playerId: String): PubgPlayers {
         log.info("registrationPlayer() called. userId={}, playerId={}", userId, playerId)
