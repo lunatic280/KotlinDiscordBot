@@ -2,7 +2,6 @@ package com.DiscordBot.KotlinDiscordBot.config
 
 import com.DiscordBot.KotlinDiscordBot.SlashCommandListener
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
-import com.DiscordBot.KotlinDiscordBot.music.listener.MusicEventListener
 import moe.kyokobot.libdave.NativeDaveFactory
 import moe.kyokobot.libdave.jda.LDJDADaveSessionFactory
 import net.dv8tion.jda.api.JDA
@@ -31,7 +30,6 @@ class JdaConfig(
     fun jda(
         slashListener: SlashCommandListener,
         commands: List<SlashCommand>,
-        musicEventListener: MusicEventListener,
         daveSessionFactory: DaveSessionFactory,
     ): JDA {
         val jda = JDABuilder.createDefault(token)
@@ -47,7 +45,6 @@ class JdaConfig(
             .setMemberCachePolicy(MemberCachePolicy.VOICE)
             .setChunkingFilter(ChunkingFilter.ALL)
             .setActivity(Activity.playing("Type /ping"))
-            .addEventListeners(slashListener, musicEventListener)
             .addEventListeners(object : ListenerAdapter() {
                 // JDA 준비 완료 시 현재 애플리케이션의 슬래시 명령들을 Discord에 갱신하는 함수입니다.
                 override fun onReady(event: ReadyEvent) {
