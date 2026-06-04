@@ -1,4 +1,4 @@
-package com.DiscordBot.KotlinDiscordBot.pubp.data
+package com.DiscordBot.KotlinDiscordBot.pubg.data
 
 data class PubgPlayerDto(
     val id: Long? = null,

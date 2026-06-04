@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "WebSearch",
+      "Bash(./gradlew clean *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'feat: 노래봇 MVP 기능 추가 \\(LavaPlayer + YouTube v2\\)' --body ' *)",
+      "Bash(where gh *)",
+      "Bash(winget list *)",
+      "Bash(./gradlew compileKotlin)",
+      "Read(//c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/**)",
+      "Bash(unzip -p /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar META-INF/MANIFEST.MF)",
+      "Bash(unzip -l /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.AudioSendHandler)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.managers.AudioManager)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.hooks.ConnectionStatus)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.hooks.ConnectionListener)",
+      "Bash(./gradlew -q dependencyInsight --dependency com.google.crypto.tink:tink --configuration runtimeClasspath)",
+      "Bash(./gradlew -q dependencyInsight --dependency club.minnced:opus-java --configuration runtimeClasspath)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.AudioModuleConfig)",
+      "Bash(javap -cp /c/Users/user/.gradle/caches/modules-2/files-2.1/net.dv8tion/JDA/6.4.1/acf34d7a0e5748ae7aa68faa77795f38dc27967b/JDA-6.4.1.jar net.dv8tion.jda.api.audio.dave.DaveSessionFactory net.dv8tion.jda.api.audio.dave.PassthroughDaveSessionFactory)",
+      "WebFetch(domain:maven.lavalink.dev)",
+      "WebFetch(domain:github.com)",
+      "Bash(git *)",
+      "Bash(curl -s -L \"https://api.github.com/repos/lavalink-devs/youtube-source/contents/common/src/main/java/dev/lavalink/youtube/clients?ref=1.18.0\")",
+      "Bash(curl -s -L \"https://raw.githubusercontent.com/lavalink-devs/youtube-source/1.18.0/common/src/main/java/dev/lavalink/youtube/YoutubeAudioSourceManager.java\")",
+      "Bash(curl *)",
+      "Bash(jar tf *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:jda.wiki)",
+      "WebFetch(domain:discord.com)",
+      "WebFetch(domain:docs.discord.com)"
+    ]
+  }
+}

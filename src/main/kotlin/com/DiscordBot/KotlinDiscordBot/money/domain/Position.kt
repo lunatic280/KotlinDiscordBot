@@ -47,6 +47,7 @@ class Position(
     ) {
 
     companion object {
+        // 지갑과 마켓 정보를 기반으로 새 코인 포지션을 생성하는 팩토리 함수입니다.
         fun createPosition(
             wallet: Wallet,
             market: Market,
@@ -62,23 +63,29 @@ class Position(
         }
     }
 
+    // 현재 포지션의 보유 코인 개수를 반환하는 함수입니다.
     fun getMarketCount(): Long = marketCount
+    // 현재 포지션의 총 매수 원가를 반환하는 함수입니다.
     fun getTotalCost(): Long = totalCost
 
+    // 포지션의 보유 코인 개수를 증가시키는 함수입니다.
     fun addMarketCount(addCount: Long) {
         marketCount += addCount
     }
 
+    // 포지션의 보유 코인 개수를 차감하는 함수입니다.
     fun minMarketCount(minCount: Long) {
         require(minCount > 0) { "minCount값이 0보다 작거나 같습니다" }
         require(minCount <= marketCount) { "minCount값이 더 높습니다." }
         marketCount -= minCount
     }
 
+    // 포지션의 총 매수 원가를 증가시키는 함수입니다.
     fun addTotalCost(addTotalCost: Long) {
         totalCost += addTotalCost
     }
 
+    // 포지션의 총 매수 원가를 차감하는 함수입니다.
     fun subtractCost(subtractCost: Long) {
         require(subtractCost > 0) {"subtractCost값이 0보다 작거나 같습니다"}
         require(subtractCost <= totalCost) { "subtractCost값이 더 많습니다"}
@@ -87,6 +94,7 @@ class Position(
 
     //TODO set함수 만들어야함
 
+    // 포지션 엔티티를 외부 전달용 DTO로 변환하는 함수입니다.
     fun toDto(): PositionDto {
         return PositionDto(
             id = id!!,

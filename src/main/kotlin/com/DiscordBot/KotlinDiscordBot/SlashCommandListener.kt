@@ -10,6 +10,7 @@ class SlashCommandListener(private val commands: List<SlashCommand>) : ListenerA
 
     private val commandMap = commands.associateBy { it.name }
 
+    // 들어온 슬래시 명령 이름에 맞는 명령 객체를 찾아 실행하는 이벤트 처리 함수입니다.
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         val command = commandMap[event.name]
         if (command != null) {

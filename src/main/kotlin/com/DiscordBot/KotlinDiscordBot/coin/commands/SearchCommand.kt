@@ -26,6 +26,7 @@ class SearchCommand(
     private val log = LoggerFactory.getLogger(SearchCommand::class.java)
     override val name = "searchcoin"
     override val description = "search coin"
+    // 코인 이름을 받아 현재 시세와 등락 정보를 Discord 임베드로 응답하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val input = event.getOption("name")?.asString?.trim()
         if (input.isNullOrBlank()) {
@@ -72,6 +73,7 @@ class SearchCommand(
 
     }
 
+    // 코인 검색 슬래시 명령의 이름, 설명, 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "코인검색")

@@ -1,8 +1,8 @@
-﻿package com.DiscordBot.KotlinDiscordBot.pubp.commands
+﻿package com.DiscordBot.KotlinDiscordBot.pubg.commands
 
 import com.DiscordBot.KotlinDiscordBot.command.SlashCommand
 import com.DiscordBot.KotlinDiscordBot.member.service.MemberService
-import com.DiscordBot.KotlinDiscordBot.pubp.service.PubgService
+import com.DiscordBot.KotlinDiscordBot.pubg.service.PubgService
 import jakarta.persistence.EntityExistsException
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.DiscordLocale
@@ -23,6 +23,7 @@ class BattlegroundsRegistration(
     override val name: String = "pubgregistration"
     override val description: String = "pubg registration"
 
+    // PUBG 플레이어 ID 등록 명령을 검증하고 사용자 계정에 연결하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val inputPlayerId = event.getOption("playerid")?.asString?.trim()
         val userId = event.user.idLong.toString()
@@ -53,6 +54,7 @@ class BattlegroundsRegistration(
         }
     }
 
+    // PUBG 등록 슬래시 명령의 이름, 설명, 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "배그등록")

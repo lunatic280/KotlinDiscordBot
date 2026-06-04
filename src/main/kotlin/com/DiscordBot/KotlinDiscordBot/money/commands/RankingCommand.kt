@@ -19,6 +19,7 @@ class RankingCommand(
     override val name: String = "ranking"
     override val description: String = "Wealth ranking"
 
+    // 총재산 상위 10명 랭킹을 조회해 Discord 임베드로 응답하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val rankings = walletService.getTop10Ranking()
 
@@ -59,6 +60,7 @@ class RankingCommand(
         event.replyEmbeds(embed).queue()
     }
 
+    // 재산 랭킹 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "랭킹")

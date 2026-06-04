@@ -24,6 +24,7 @@ class MyWealthCommand(
     override val name: String = "wallet"
     override val description: String = "check my wallet"
 
+    // 사용자 지갑과 보유 코인을 조회해 재산 정보를 Discord 임베드로 응답하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val userId = event.user.idLong.toString()
 
@@ -81,6 +82,7 @@ class MyWealthCommand(
         event.replyEmbeds(embed.build()).queue()
     }
 
+    // 내 재산 확인 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "내재산")

@@ -10,6 +10,9 @@ group = "com.DiscordBot"
 version = "0.0.1-SNAPSHOT"
 description = "Kotlin Discord Bot"
 
+val libdaveVersion = "ce725965e"
+val youtubeSourceVersion = "1.18.0"
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
@@ -19,10 +22,12 @@ java {
 repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/snapshot") }
+	maven { url = uri("https://maven.lavalink.dev/snapshots") }
+	maven { url = uri("https://maven.lavalink.dev/releases") }
 }
 
 dependencies {
-	implementation("net.dv8tion:JDA:5.4.0")
+	implementation("net.dv8tion:JDA:6.4.1")
 
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -38,6 +43,15 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.json:json:20240303")
 	implementation("org.jsoup:jsoup:1.17.2")
+	implementation("org.apache.poi:poi-ooxml:5.2.5")
+	implementation("dev.arbjerg:lavaplayer:2.2.6")
+	implementation("dev.lavalink.youtube:v2:$youtubeSourceVersion")
+	implementation("moe.kyokobot.libdave:adapter-jda:$libdaveVersion")
+	implementation("moe.kyokobot.libdave:impl-jni:$libdaveVersion")
+	runtimeOnly("moe.kyokobot.libdave:natives-linux-x86-64:$libdaveVersion")
+	runtimeOnly("moe.kyokobot.libdave:natives-win-x86-64:$libdaveVersion")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0")
+	implementation("com.google.cloud:google-cloud-speech:4.39.0")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 

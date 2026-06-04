@@ -26,6 +26,7 @@ class BuyCommand(
     override val name: String = "buy"
     override val description: String = "buy coin"
 
+    // 코인 구매 명령 입력을 검증하고 현재가 기준으로 구매를 처리하는 함수입니다.
     override fun handle(event: SlashCommandInteractionEvent) {
         val inputCoinName = event.getOption("name")?.asString?.trim()
         val inputCoinCount = event.getOption("count")?.asString?.trim()
@@ -133,6 +134,7 @@ class BuyCommand(
             )
     }
 
+    // 코인 구매 슬래시 명령의 이름, 설명, 옵션 정보를 생성하는 함수입니다.
     override fun getCommandData(): SlashCommandData {
         return Commands.slash(name, description)
             .setNameLocalization(DiscordLocale.KOREAN, "코인구매")
