@@ -4,7 +4,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 
-@Entity
+//@Entity
 @Table(name = "watched_site",
     indexes = [
         Index(name = "idx_watched_site_alert_channel", columnList = "alert_channel_id"),
