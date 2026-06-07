@@ -66,7 +66,7 @@ class PubgServiceTest {
         val matchId = matches[0]["id"].asText()
         val matchResponse = createService().getPlayersMatchesInfo(matchId)
         val matchRoot = objectMapper.readTree(matchResponse)
-        println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(matchRoot))
+        //println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(matchRoot))
 
         assertThat(matchRoot["data"]["type"].asText()).isEqualTo("match")
         assertThat(matchRoot["data"]["id"].asText()).isEqualTo(matchId)

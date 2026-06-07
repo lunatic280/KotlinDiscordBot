@@ -2,8 +2,11 @@ package com.DiscordBot.KotlinDiscordBot.pubg.service
 
 import com.DiscordBot.KotlinDiscordBot.member.domain.Member
 import com.DiscordBot.KotlinDiscordBot.member.repository.MemberRepository
+import com.DiscordBot.KotlinDiscordBot.pubg.data.PubgTeamMatchSummary
 import com.DiscordBot.KotlinDiscordBot.pubg.domain.PubgPlayers
 import com.DiscordBot.KotlinDiscordBot.pubg.repository.PubgRepository
+import com.DiscordBot.KotlinDiscordBot.pubg.utils.PubgUtils
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.persistence.EntityExistsException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -19,10 +22,13 @@ class PubgService(
     private val webClientBuilder: WebClient.Builder,
     private val pubgRepository: PubgRepository,
     @Value("\${pubg.api-key}") private val apiKey: String,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val pubgUtils: PubgUtils
 ) {
 
     private val log = LoggerFactory.getLogger(PubgService::class.java)
+
+    private val objectMapper = jacksonObjectMapper()
 
     private val client = webClientBuilder
         .baseUrl("https://api.pubg.com")
@@ -110,5 +116,17 @@ class PubgService(
             )
             return saved
         }
+    }
+
+    fun getMyLatestTeamSummary(playerName: String): PubgTeamMatchSummary {
+        val playerResponse = getPlayersByName(playerName)
+        val playerRoot = objectMapper.readTree(playerResponse)
+
+        val matchId = playerRoot["data"][0]["relationships"]["matches"]["data"][0]["id"].asText()
+
+        val matchResponse = getPlayersMatchesInfo(matchId)
+        val matchRoot = objectMapper.readTree(matchResponse)
+
+        return pubgUtils.extractMyTeamSummary(matchRoot, playerName)
     }
 }

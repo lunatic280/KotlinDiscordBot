@@ -30,6 +30,10 @@ class BattleGroundRecordResearch(
             log.info("BattleGroundRecordResearch is not implemented yet for userId={}", userId)
             event.reply("최근 매치 조회 기능은 아직 구현 중입니다.").setEphemeral(true).queue()
         }
+        val findUserName = pubgService.getPlayersInfo(userId.toString())
+        val result = pubgService.getMyLatestTeamSummary(pubgService.getPlayersByName(findUserName))
+
+        event.reply("$result").setEphemeral(true).queue()
     }
 
     // 배틀그라운드 매치 검색 슬래시 명령의 이름과 설명을 생성하는 함수입니다.
