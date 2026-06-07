@@ -31,7 +31,9 @@ class BattleGroundRecordResearch(
             event.reply("최근 매치 조회 기능은 아직 구현 중입니다.").setEphemeral(true).queue()
         }
         val findUserName = pubgService.getPlayersInfo(userId.toString())
+        log.info("findUserName: $findUserName")
         val result = pubgService.getMyLatestTeamSummary(pubgService.getPlayersByName(findUserName))
+        log.info("result: $result")
 
         event.reply("$result").setEphemeral(true).queue()
     }

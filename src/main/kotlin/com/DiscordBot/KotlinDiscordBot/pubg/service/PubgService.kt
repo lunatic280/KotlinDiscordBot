@@ -120,12 +120,15 @@ class PubgService(
 
     fun getMyLatestTeamSummary(playerName: String): PubgTeamMatchSummary {
         val playerResponse = getPlayersByName(playerName)
+        log.info("getMyLatestTeamSummary() called. playerName={}", playerName)
         val playerRoot = objectMapper.readTree(playerResponse)
 
         val matchId = playerRoot["data"][0]["relationships"]["matches"]["data"][0]["id"].asText()
 
         val matchResponse = getPlayersMatchesInfo(matchId)
+        log.info("matchResponse: $matchResponse")
         val matchRoot = objectMapper.readTree(matchResponse)
+        log.info("matchRoot: $matchRoot")
 
         return pubgUtils.extractMyTeamSummary(matchRoot, playerName)
     }
