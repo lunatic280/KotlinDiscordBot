@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,7 +24,9 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class JdaConfig(
     @Value("\${discord.token}") private val token: String,
+    @Value("\${discord.guild-id:}") private val guildId: String,
 ) {
+    private val log = LoggerFactory.getLogger(JdaConfig::class.java)
 
     // Discord JDA 클라이언트를 구성하고 슬래시 명령과 음악 이벤트 리스너를 등록하는 함수입니다.
     @Bean
@@ -45,11 +48,24 @@ class JdaConfig(
             .setMemberCachePolicy(MemberCachePolicy.VOICE)
             .setChunkingFilter(ChunkingFilter.ALL)
             .setActivity(Activity.playing("Type /ping"))
-            .addEventListeners(object : ListenerAdapter() {
+            .addEventListeners(slashListener, object : ListenerAdapter() {
                 // JDA 준비 완료 시 현재 애플리케이션의 슬래시 명령들을 Discord에 갱신하는 함수입니다.
                 override fun onReady(event: ReadyEvent) {
                     val commandData: List<SlashCommandData> = commands.map { it.getCommandData() }
-                    event.jda.updateCommands().addCommands(commandData).queue()
+                    if (guildId.isBlank()) {
+                        log.info("Registering {} global slash commands", commandData.size)
+                        event.jda.updateCommands().addCommands(commandData).queue()
+                        return
+                    }
+
+                    val guild = event.jda.getGuildById(guildId)
+                    if (guild == null) {
+                        log.warn("Cannot register guild slash commands. guildId={} was not found", guildId)
+                        return
+                    }
+
+                    log.info("Registering {} guild slash commands. guildId={}", commandData.size, guildId)
+                    guild.updateCommands().addCommands(commandData).queue()
                 }
             })
             .build()
