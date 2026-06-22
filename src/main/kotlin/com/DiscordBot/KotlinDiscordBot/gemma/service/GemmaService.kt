@@ -24,22 +24,28 @@ class GemmaService(
         .build()
 
     fun generateText(prompt: String): Mono<String> {
-        if (properties.apiKey.isNotEmpty()) {
-            throw IllegalArgumentException("API key is required")
-        }
-        if (prompt.isNotEmpty()) {
-            throw IllegalArgumentException("Prompt can not be empty.")
-        }
+        require(properties.apiKey.isNotBlank()) { "API key is required" }
+        require(prompt.isNotBlank()) { "Prompt can not be empty." }
 
-        val request = mapOf(
+        val request = mutableMapOf<String, Any>(
             "contents" to listOf(
                 mapOf(
+                    "role" to "user",
                     "parts" to listOf(
                         mapOf("text" to prompt)
                     )
                 )
             )
         )
+        properties.systemPrompt.trim()
+            .takeIf { it.isNotBlank() }
+            ?.let { systemPrompt ->
+                request["system_instruction"] = mapOf(
+                    "parts" to listOf(
+                        mapOf("text" to systemPrompt)
+                    )
+                )
+            }
 
         return client.post()
             .uri("/v1beta/models/${MODEL}:generateContent")
