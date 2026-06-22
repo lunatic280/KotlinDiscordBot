@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
 
 @Service
@@ -14,7 +15,8 @@ class GemmaService(
     private val properties: GemmaProperties
 ) {
     companion object {
-        private const val MODEL = "gemma-4-31b-it"
+        private const val PRIMARY_MODEL = "gemma-4-31b-it"
+        private const val FALLBACK_MODEL = "gemma-4-26b-it"
     }
     private val log = LoggerFactory.getLogger(GemmaService::class.java)
 
@@ -47,22 +49,34 @@ class GemmaService(
                 )
             }
 
+        return callModel(PRIMARY_MODEL, properties.apiKey, request)
+            .onErrorResume(WebClientResponseException.ServiceUnavailable::class.java) { error ->
+                log.warn("{} unavailable. Falling back to {}", PRIMARY_MODEL, FALLBACK_MODEL, error)
+                callModel(FALLBACK_MODEL, properties.apiKey, request)
+            }
+    }
+
+    private fun callModel(model: String, apiKey: String, request: Map<String, Any>): Mono<String> {
         return client.post()
-            .uri("/v1beta/models/${MODEL}:generateContent")
-            .header("x-goog-api-key", properties.apiKey)
+            .uri("/v1beta/models/${model}:generateContent")
+            .header("x-goog-api-key", apiKey)
             .header("Content-Type", "application/json")
             .bodyValue(request)
             .retrieve()
             .bodyToMono(JsonNode::class.java)
-            .map { root ->
-                root["candidates"]
-                    ?.get(0)
-                    ?.get("content")
-                    ?.get("parts")
-                    ?.get(0)
-                    ?.get("text")
-                    ?.asText()
-                    ?: "Gemma 응답 텍스트를 찾지 못했습니다."
-            }
+            .map { root -> extractText(root) }
     }
+
+    private fun extractText(root: JsonNode): String {
+        return root["candidates"]
+            ?.get(0)
+            ?.get("content")
+            ?.get("parts")
+            ?.get(0)
+            ?.get("text")
+            ?.asText()
+            ?: "Gemma 응답 텍스트를 찾지 못했습니다."
+    }
+
+
 }
