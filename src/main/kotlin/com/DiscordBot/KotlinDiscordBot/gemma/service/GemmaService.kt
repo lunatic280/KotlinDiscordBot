@@ -37,6 +37,11 @@ class GemmaService(
                         mapOf("text" to prompt)
                     )
                 )
+            ),
+            "generationConfig" to mapOf(
+                "thinkingConfig" to mapOf(
+                    "includeThoughts" to false
+                )
             )
         )
         properties.systemPrompt.trim()
@@ -68,13 +73,31 @@ class GemmaService(
     }
 
     private fun extractText(root: JsonNode): String {
-        return root["candidates"]
+        val parts = root["candidates"]
             ?.get(0)
             ?.get("content")
             ?.get("parts")
-            ?.get(0)
-            ?.get("text")
-            ?.stringValue()
-            ?: "Gemma 응답 텍스트를 찾지 못했습니다."
+
+        if (parts == null || !parts.isArray) {
+            return "Gemma 응답 텍스트를 찾지 못했습니다."
+        }
+
+        val answerParts = mutableListOf<String>()
+
+        for (part in parts) {
+            val isThought = part["thought"]?.booleanValue() == true
+            if (isThought) {
+                continue
+            }
+
+            val text = part["text"]?.stringValue()?.trim()
+            if (!text.isNullOrBlank()) {
+                answerParts += text
+            }
+        }
+
+        return answerParts
+            .joinToString("\n")
+            .ifBlank { "Gemma 최종 답변을 찾지 못했습니다." }
     }
 }
