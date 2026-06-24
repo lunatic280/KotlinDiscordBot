@@ -16,7 +16,7 @@ class GemmaService(
 ) {
     companion object {
         private const val PRIMARY_MODEL = "gemma-4-31b-it"
-        private const val FALLBACK_MODEL = "gemma-4-26b-it"
+        private const val FALLBACK_MODEL = "gemma-4-26b-a4b-it"
     }
     private val log = LoggerFactory.getLogger(GemmaService::class.java)
 
