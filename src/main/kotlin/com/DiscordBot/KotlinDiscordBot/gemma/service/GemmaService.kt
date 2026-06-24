@@ -1,13 +1,13 @@
 package com.DiscordBot.KotlinDiscordBot.gemma.service
 
 import com.DiscordBot.KotlinDiscordBot.gemma.config.GemmaProperties
-import com.fasterxml.jackson.databind.JsonNode
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
+import tools.jackson.databind.JsonNode
 
 @Service
 class GemmaService(
@@ -74,9 +74,7 @@ class GemmaService(
             ?.get("parts")
             ?.get(0)
             ?.get("text")
-            ?.asText()
+            ?.stringValue()
             ?: "Gemma 응답 텍스트를 찾지 못했습니다."
     }
-
-
 }
