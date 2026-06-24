@@ -38,6 +38,9 @@ class GemmaService(
                     )
                 )
             ),
+            "tools" to listOf(
+                mapOf("googleSearch" to emptyMap<String, Any>())
+            ),
             "generationConfig" to mapOf(
                 "thinkingConfig" to mapOf(
                     "includeThoughts" to false
