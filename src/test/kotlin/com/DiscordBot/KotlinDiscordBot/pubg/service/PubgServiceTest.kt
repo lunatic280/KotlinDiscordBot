@@ -2,6 +2,7 @@ package com.DiscordBot.KotlinDiscordBot.pubg.service
 
 import com.DiscordBot.KotlinDiscordBot.member.repository.MemberRepository
 import com.DiscordBot.KotlinDiscordBot.pubg.repository.PubgRepository
+import com.DiscordBot.KotlinDiscordBot.pubg.utils.PubgUtils
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
@@ -26,7 +27,8 @@ class PubgServiceTest {
             webClientBuilder = WebClient.builder(),
             pubgRepository = pubgRepository,
             apiKey = System.getenv("PUBG_API_KEY"),
-            memberRepository = memberRepository
+            memberRepository = memberRepository,
+            pubgUtils = PubgUtils()
         )
     }
 

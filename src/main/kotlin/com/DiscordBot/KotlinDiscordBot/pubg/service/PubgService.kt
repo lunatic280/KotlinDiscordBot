@@ -45,7 +45,7 @@ class PubgService(
         return client.get()
             .uri { builder ->
                 builder.path("/shards/steam/players")
-                    .queryParam("filter[playerIds]", player.getPlayerId())
+                    .queryParam("filter[playerNames]", player.getPlayerId())
                     .build()
             }
             .retrieve()
@@ -118,12 +118,39 @@ class PubgService(
         }
     }
 
-    fun getMyLatestTeamSummary(playerName: String): PubgTeamMatchSummary {
-        val playerResponse = getPlayersByName(playerName)
+    fun getMyLatestTeamSummary(playerName: String): PubgTeamMatchSummary? {
         log.info("getMyLatestTeamSummary() called. playerName={}", playerName)
+        val playerResponse = getPlayersByName(playerName)
         val playerRoot = objectMapper.readTree(playerResponse)
+        val players = playerRoot.get("data")
 
-        val matchId = playerRoot["data"][0]["relationships"]["matches"]["data"][0]["id"].asText()
+        if (!players.isArray || players.isEmpty()) {
+            throw IllegalArgumentException("Player not found: $playerName")
+        }
+
+        val matches = players
+            .path(0)
+            .path("relationships")
+            .path("matches")
+            .path("data")
+
+        if (!matches.isArray || matches.isEmpty) {
+            log.info(
+                "Recent match not found. playerName={}",
+                playerName
+            )
+            return null
+        }
+
+        val matchId = matches.path(0).path("id").asText()
+
+        if (matchId.isBlank()) {
+            log.warn(
+                "Empty match ID. playerName={}",
+                playerName
+            )
+            return null
+        }
 
         val matchResponse = getPlayersMatchesInfo(matchId)
         log.info("matchResponse: $matchResponse")

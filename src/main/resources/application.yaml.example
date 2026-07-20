@@ -25,3 +25,12 @@ jda:
 botcommands:
   owners: ${BOTCOMMANDS_OWNERS:}
   prefixes:
+
+gemma:
+  api-key: ${GEMMA_API_KEY:}
+  base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+  system-prompt: ${GEMMA_SYSTEM_PROMPT:너는 Discord 봇에서 동작하는 한국어 AI 어시스턴트입니다. 답변은 간결하고 정확하게 한국어로 작성하세요.}
+
+aladin:
+  api:
+    key: ${ALADIN_TTB_KEY:}
