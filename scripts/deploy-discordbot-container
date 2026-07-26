@@ -1,0 +1,95 @@
+#!/bin/sh
+
+set -eu
+
+APP_DIR=/opt/discordbot
+COMPOSE_FILE="$APP_DIR/compose.prod.yaml"
+ENV_FILE="$APP_DIR/.env"
+EXPECTED_IMAGE_NAME=ghcr.io/lunatic280/kotlindiscordbot-ops
+
+fail() {
+    printf '%s\n' "$*" >&2
+    exit 1
+}
+
+set_image() {
+    next_image=$1
+    temporary_file=$(mktemp "$APP_DIR/.env.XXXXXX")
+
+    sed '/^APP_IMAGE=/d' "$ENV_FILE" > "$temporary_file"
+
+    printf 'APP_IMAGE=%s\n' "$next_image" >> "$temporary_file"
+    install -m 0600 -o root -g root "$temporary_file" "$ENV_FILE"
+    rm -f "$temporary_file"
+}
+
+compose() {
+    docker compose \
+        --env-file "$ENV_FILE" \
+        -f "$COMPOSE_FILE" \
+        "$@"
+}
+
+rollback() {
+    if [ -z "$previous_image" ]; then
+        printf '%s\n' "No previous image is available for rollback." >&2
+        return 1
+    fi
+
+    printf 'Rolling back to %s\n' "$previous_image" >&2
+    set_image "$previous_image"
+    compose pull bot
+    compose up -d --no-deps --force-recreate bot
+}
+
+[ "$#" -eq 2 ] || fail "Usage: $0 <ghcr-image-name> <40-character-commit-sha>"
+
+image_name=$1
+image_tag=$2
+
+[ "$image_name" = "$EXPECTED_IMAGE_NAME" ] ||
+    fail "Only $EXPECTED_IMAGE_NAME can be deployed."
+
+[ "${#image_tag}" -eq 40 ] || fail "The image tag must be a full 40-character commit SHA."
+case "$image_tag" in
+    *[!0-9a-f]*) fail "The image tag must contain only lowercase hexadecimal characters." ;;
+esac
+
+[ -f "$COMPOSE_FILE" ] || fail "$COMPOSE_FILE does not exist."
+[ -f "$ENV_FILE" ] || fail "$ENV_FILE does not exist."
+
+previous_image=$(sed -n "s/^APP_IMAGE=['\"]\\{0,1\\}\\([^'\"]*\\)['\"]\\{0,1\\}$/\\1/p" "$ENV_FILE" | tail -n 1)
+next_image="$image_name:$image_tag"
+
+printf 'Deploying %s\n' "$next_image"
+set_image "$next_image"
+
+if ! compose pull bot || ! compose up -d --no-deps --force-recreate bot; then
+    rollback || true
+    fail "Deployment failed while updating the container."
+fi
+
+attempt=1
+while [ "$attempt" -le 18 ]; do
+    container_id=$(compose ps -q bot)
+    if [ -n "$container_id" ]; then
+        container_state=$(docker inspect --format '{{.State.Status}} {{.RestartCount}}' "$container_id")
+        if [ "$container_state" != "running 0" ]; then
+            compose logs --tail 100 bot >&2 || true
+            rollback || true
+            fail "The bot container did not remain stable after deployment: $container_state"
+        fi
+
+        if compose logs --since 2m bot 2>&1 | grep -Fq 'Discord JDA ready.'; then
+            printf 'Deployment succeeded: %s\n' "$next_image"
+            exit 0
+        fi
+    fi
+
+    sleep 5
+    attempt=$((attempt + 1))
+done
+
+compose logs --tail 100 bot >&2 || true
+rollback || true
+fail "The bot did not report Discord readiness within 90 seconds."

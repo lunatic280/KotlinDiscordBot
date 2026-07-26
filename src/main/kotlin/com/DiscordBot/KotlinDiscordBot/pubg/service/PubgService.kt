@@ -2,8 +2,11 @@ package com.DiscordBot.KotlinDiscordBot.pubg.service
 
 import com.DiscordBot.KotlinDiscordBot.member.domain.Member
 import com.DiscordBot.KotlinDiscordBot.member.repository.MemberRepository
+import com.DiscordBot.KotlinDiscordBot.pubg.data.PubgTeamMatchSummary
 import com.DiscordBot.KotlinDiscordBot.pubg.domain.PubgPlayers
 import com.DiscordBot.KotlinDiscordBot.pubg.repository.PubgRepository
+import com.DiscordBot.KotlinDiscordBot.pubg.utils.PubgUtils
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.persistence.EntityExistsException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -19,10 +22,13 @@ class PubgService(
     private val webClientBuilder: WebClient.Builder,
     private val pubgRepository: PubgRepository,
     @Value("\${pubg.api-key}") private val apiKey: String,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val pubgUtils: PubgUtils
 ) {
 
     private val log = LoggerFactory.getLogger(PubgService::class.java)
+
+    private val objectMapper = jacksonObjectMapper()
 
     private val client = webClientBuilder
         .baseUrl("https://api.pubg.com")
@@ -39,7 +45,7 @@ class PubgService(
         return client.get()
             .uri { builder ->
                 builder.path("/shards/steam/players")
-                    .queryParam("filter[playerIds]", player.getPlayerId())
+                    .queryParam("filter[playerNames]", player.getPlayerId())
                     .build()
             }
             .retrieve()
@@ -110,5 +116,47 @@ class PubgService(
             )
             return saved
         }
+    }
+
+    fun getMyLatestTeamSummary(playerName: String): PubgTeamMatchSummary? {
+        log.info("getMyLatestTeamSummary() called. playerName={}", playerName)
+        val playerResponse = getPlayersByName(playerName)
+        val playerRoot = objectMapper.readTree(playerResponse)
+        val players = playerRoot.get("data")
+
+        if (!players.isArray || players.isEmpty()) {
+            throw IllegalArgumentException("Player not found: $playerName")
+        }
+
+        val matches = players
+            .path(0)
+            .path("relationships")
+            .path("matches")
+            .path("data")
+
+        if (!matches.isArray || matches.isEmpty) {
+            log.info(
+                "Recent match not found. playerName={}",
+                playerName
+            )
+            return null
+        }
+
+        val matchId = matches.path(0).path("id").asText()
+
+        if (matchId.isBlank()) {
+            log.warn(
+                "Empty match ID. playerName={}",
+                playerName
+            )
+            return null
+        }
+
+        val matchResponse = getPlayersMatchesInfo(matchId)
+        log.info("matchResponse: $matchResponse")
+        val matchRoot = objectMapper.readTree(matchResponse)
+        log.info("matchRoot: $matchRoot")
+
+        return pubgUtils.extractMyTeamSummary(matchRoot, playerName)
     }
 }

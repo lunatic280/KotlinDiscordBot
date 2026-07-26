@@ -48,6 +48,7 @@ dependencies {
 	implementation("dev.lavalink.youtube:v2:$youtubeSourceVersion")
 	implementation("moe.kyokobot.libdave:adapter-jda:$libdaveVersion")
 	implementation("moe.kyokobot.libdave:impl-jni:$libdaveVersion")
+	runtimeOnly("moe.kyokobot.libdave:natives-linux-aarch64:$libdaveVersion")
 	runtimeOnly("moe.kyokobot.libdave:natives-linux-x86-64:$libdaveVersion")
 	runtimeOnly("moe.kyokobot.libdave:natives-win-x86-64:$libdaveVersion")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0")
@@ -88,7 +89,6 @@ tasks.register<Test>("liveTest") {
 		events("passed", "failed", "skipped")
 	}
 }
-
 
 
 
