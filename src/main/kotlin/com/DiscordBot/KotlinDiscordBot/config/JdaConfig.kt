@@ -51,6 +51,7 @@ class JdaConfig(
             .addEventListeners(slashListener, object : ListenerAdapter() {
                 // JDA 준비 완료 시 현재 애플리케이션의 슬래시 명령들을 Discord에 갱신하는 함수입니다.
                 override fun onReady(event: ReadyEvent) {
+                    log.info("Discord JDA ready. selfUserId={}", event.jda.selfUser.id)
                     val commandData: List<SlashCommandData> = commands.map { it.getCommandData() }
                     if (guildId.isBlank()) {
                         log.info("Registering {} global slash commands", commandData.size)
